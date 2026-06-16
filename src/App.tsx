@@ -8,6 +8,7 @@ import Library from './components/Library';
 import ProfileDashboard from './components/ProfileDashboard';
 import DevPortal from './components/DevPortal';
 import GameDetailModal from './components/GameDetailModal';
+import { Gamepad2, Layers, Settings, User as UserIcon } from 'lucide-react';
 
 export default function App() {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -201,6 +202,42 @@ export default function App() {
 
       {/* FOOTER */}
       <Footer />
+
+      {/* MOBILE BOTTOM NAVIGATION */}
+      <nav className="mobile-nav">
+        <button 
+          className={`mobile-nav-item ${activeTab === 'store' ? 'active' : ''}`}
+          onClick={() => setActiveTab('store')}
+        >
+          <Gamepad2 size={20} />
+          <span>Store</span>
+        </button>
+        <button 
+          className={`mobile-nav-item ${activeTab === 'library' ? 'active' : ''}`}
+          onClick={() => setActiveTab('library')}
+        >
+          <Layers size={20} />
+          <span>Library</span>
+        </button>
+        {user && (
+          <button 
+            className={`mobile-nav-item ${activeTab === 'developer' ? 'active' : ''}`}
+            onClick={() => setActiveTab('developer')}
+          >
+            <Settings size={20} />
+            <span>Dev Portal</span>
+          </button>
+        )}
+        {user && (
+          <button 
+            className={`mobile-nav-item ${activeTab === 'profile' ? 'active' : ''}`}
+            onClick={() => setActiveTab('profile')}
+          >
+            <UserIcon size={20} />
+            <span>Profile</span>
+          </button>
+        )}
+      </nav>
     </div>
   );
 }

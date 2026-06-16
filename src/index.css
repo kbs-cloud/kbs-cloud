@@ -419,6 +419,7 @@ h1, h2, h3, h4 {
   right: 12px;
   background: rgba(5, 3, 14, 0.75);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border: 1px solid rgba(57, 255, 20, 0.3);
   color: var(--green);
   font-family: var(--font-mono);
@@ -604,6 +605,7 @@ h1, h2, h3, h4 {
   height: 100%;
   background: rgba(5, 3, 14, 0.85);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 200;
   display: flex;
   align-items: center;
@@ -919,5 +921,428 @@ body.perf-mode .game-card {
 
 body.perf-mode .modal-overlay {
   background: rgba(5, 3, 14, 0.96) !important;
+}
+
+/* --- MOBILE RESPONSIVENESS AND GOOGLE PLAY-STYLE LAYOUTS --- */
+
+/* Performance Mode button styles */
+.btn-perf-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-glass);
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.03);
+  transition: var(--transition-smooth);
+}
+.btn-perf-toggle.perf-active {
+  border-color: rgba(255, 123, 0, 0.4);
+  color: var(--orange);
+  background: rgba(255, 123, 0, 0.08);
+}
+.btn-perf-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.btn-perf-toggle.perf-active:hover {
+  background: rgba(255, 123, 0, 0.15);
+}
+
+/* Mobile Bottom Navigation */
+.mobile-nav {
+  display: none;
+}
+
+/* Base styles for new components to support responsiveness */
+.game-card-developer-mobile {
+  display: none;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Library Responsive Classes */
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.library-card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 240px;
+}
+
+.library-card-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.3) blur(2px);
+  z-index: -1;
+}
+
+.library-card-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+  background: linear-gradient(180deg, rgba(5,3,14,0.4) 0%, rgba(5,3,14,0.9) 100%);
+}
+
+.library-card-title {
+  font-size: 1.4rem;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.library-card-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--cyan);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.library-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.library-card-actions .btn {
+  flex: 1;
+}
+
+/* Mobile Screens (<= 768px) */
+@media (max-width: 768px) {
+  .app-container {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom)); /* Space for fixed bottom nav with safe area */
+  }
+
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(60px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: border-box;
+    background: rgba(12, 9, 28, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border-glass);
+    z-index: 150;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 8px;
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    gap: 4px;
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    width: 25%;
+    height: 100%;
+  }
+
+  .mobile-nav-item.active {
+    color: var(--cyan);
+    text-shadow: 0 0 8px var(--cyan-glow);
+  }
+
+  .mobile-nav-item svg {
+    transition: var(--transition-smooth);
+  }
+
+  .mobile-nav-item.active svg {
+    filter: drop-shadow(0 0 4px var(--cyan-glow));
+    transform: scale(1.1);
+  }
+}
+
+/* Google Play Store style compact row lists for storefront and library */
+@media (max-width: 600px) {
+  .game-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .game-card {
+    flex-direction: row !important;
+    height: auto !important;
+    padding: 12px !important;
+    gap: 12px !important;
+    align-items: center !important;
+  }
+
+  .game-card-img-wrapper {
+    width: 72px !important;
+    height: 72px !important;
+    flex-shrink: 0 !important;
+    border-radius: 8px !important;
+    margin: 0 !important;
+  }
+
+  .game-card-img {
+    border-radius: 8px !important;
+  }
+
+  .game-card-status-badge {
+    display: none !important;
+  }
+
+  .game-card-content {
+    padding: 0 !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: 12px !important;
+    min-width: 0 !important;
+  }
+
+  .game-card-tags {
+    display: none !important;
+  }
+
+  .game-card-desc {
+    display: none !important;
+  }
+
+  .game-card-info-block {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+  }
+
+  .game-card-title {
+    font-size: 1.05rem !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-weight: 600 !important;
+  }
+
+  .game-card-developer-mobile {
+    display: block !important;
+    font-size: 0.75rem !important;
+    color: var(--text-secondary) !important;
+  }
+
+  .game-card-footer {
+    border-top: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .game-card-footer .game-developer {
+    display: none !important;
+  }
+
+  .game-card-footer div {
+    gap: 6px !important;
+  }
+
+  .game-card-footer .btn {
+    padding: 6px 12px !important;
+    font-size: 0.8rem !important;
+    border-radius: 6px !important;
+  }
+
+  /* Same treatment for Library cards */
+  .library-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .library-card {
+    flex-direction: row !important;
+    height: auto !important;
+    padding: 12px !important;
+    gap: 12px !important;
+    align-items: center !important;
+  }
+
+  .library-card-bg {
+    position: static !important;
+    width: 72px !important;
+    height: 72px !important;
+    flex-shrink: 0 !important;
+    border-radius: 8px !important;
+    filter: none !important;
+    z-index: auto !important;
+    margin: 0 !important;
+  }
+
+  .library-card-content {
+    padding: 0 !important;
+    height: auto !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    background: none !important;
+    gap: 12px !important;
+    min-width: 0 !important;
+  }
+
+  .library-card-info {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+  }
+
+  .library-card-title {
+    font-size: 1.05rem !important;
+    color: #fff !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-weight: 600 !important;
+  }
+
+  .library-card-badge {
+    align-self: flex-start !important;
+    font-size: 0.6rem !important;
+    padding: 1px 4px !important;
+  }
+
+  .library-card-actions {
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .library-card-actions .btn {
+    padding: 6px 12px !important;
+    font-size: 0.8rem !important;
+    border-radius: 6px !important;
+    flex: none !important;
+  }
+}
+
+/* Prevent header overflow and style icon-only buttons on tiny screens */
+@media (max-width: 576px) {
+  .brand-cloud,
+  .brand-hub {
+    display: none !important;
+  }
+  
+  .navbar-brand-text {
+    letter-spacing: 0.5px !important;
+  }
+
+  .navbar {
+    padding: 0 12px !important;
+  }
+
+  .navbar-actions {
+    gap: 8px !important;
+  }
+
+  .btn-perf-toggle {
+    padding: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+    gap: 0 !important;
+  }
+
+  .btn-perf-toggle .perf-toggle-text {
+    display: none !important;
+  }
+
+  .user-profile-badge {
+    padding: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    gap: 0 !important;
+    justify-content: center !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .user-profile-badge .username,
+  .user-profile-badge .user-menu-chevron {
+    display: none !important;
+  }
+
+  .sign-in-btn {
+    padding: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+  }
+
+  .sign-in-text {
+    display: none !important;
+  }
+
+  /* Shrink hero banner on mobile to Google App Store style promo */
+  .hero-banner {
+    height: 180px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .hero-overlay {
+    padding: 16px !important;
+    height: 100% !important;
+    background: linear-gradient(to top, rgba(5,3,14,0.95) 0%, rgba(5,3,14,0.6) 50%, rgba(5,3,14,0.2) 100%) !important;
+  }
+
+  .hero-badge {
+    font-size: 0.6rem !important;
+    padding: 2px 6px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .hero-title {
+    font-size: 1.35rem !important;
+    margin-bottom: 4px !important;
+  }
+
+  .hero-description {
+    display: none !important; /* Hide long description on mobile hero to keep clean */
+  }
+
+  .hero-overlay .btn {
+    padding: 6px 12px !important;
+    font-size: 0.8rem !important;
+    border-radius: 6px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
 }
 

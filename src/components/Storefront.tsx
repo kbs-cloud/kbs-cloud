@@ -108,7 +108,10 @@ export default function Storefront({
                       <span key={idx} className="game-tag">{t}</span>
                     ))}
                   </div>
-                  <h3 className="game-card-title">{game.title}</h3>
+                  <div className="game-card-info-block">
+                    <h3 className="game-card-title">{game.title}</h3>
+                    <span className="game-card-developer-mobile">{game.developer}</span>
+                  </div>
                   <p className="game-card-desc">{game.description}</p>
 
                   <div className="game-card-footer">

@@ -29,65 +29,30 @@ export default function Library({
         loadingGames ? (
           <div style={{ color: 'var(--text-secondary)' }}>Loading library catalog...</div>
         ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '24px',
-            marginTop: '16px'
-          }}>
+          <div className="library-grid">
             {games.map(game => (
-              <div key={game.id} className="glass-panel" style={{
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-                height: '240px',
-                position: 'relative'
-              }}>
+              <div key={game.id} className="library-card glass-panel">
                 <img 
                   src={game.cover_image || '/starswarm_cover.png'} 
                   alt={game.title} 
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    filter: 'brightness(0.3) blur(2px)',
-                    zIndex: -1
-                  }} 
+                  className="library-card-bg"
                 />
                 
-                <div style={{
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: '100%',
-                  justifyContent: 'space-between',
-                  background: 'linear-gradient(180deg, rgba(5,3,14,0.4) 0%, rgba(5,3,14,0.9) 100%)'
-                }}>
-                  <div>
-                    <h3 style={{ fontSize: '1.4rem', color: '#fff', marginBottom: '4px' }}>
+                <div className="library-card-content">
+                  <div className="library-card-info">
+                    <h3 className="library-card-title">
                       {game.icon} {game.title}
                     </h3>
-                    <span style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '0.7rem',
-                      color: 'var(--cyan)',
-                      border: '1px solid rgba(0, 255, 255, 0.3)',
-                      padding: '2px 6px',
-                      borderRadius: '4px',
-                      textTransform: 'uppercase'
-                    }}>
+                    <span className="library-card-badge">
                       SSO Active
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <a href={getLaunchUrl(game)} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm" style={{ flex: 1 }}>
+                  <div className="library-card-actions">
+                    <a href={getLaunchUrl(game)} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm launch-btn">
                       Launch Game
                     </a>
-                    <button className="btn btn-secondary btn-sm" onClick={() => setSelectedGame(game)}>
+                    <button className="btn btn-secondary btn-sm details-btn" onClick={() => setSelectedGame(game)}>
                       Details
                     </button>
                   </div>

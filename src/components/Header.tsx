@@ -30,10 +30,10 @@ export default function Header({
     <header className="navbar">
       <a href="/" className="navbar-brand" onClick={(e) => { e.preventDefault(); setActiveTab('store'); }}>
         <Gamepad2 className="logo-glow" size={32} />
-        <span style={{ letterSpacing: '1px' }}>
+        <span className="navbar-brand-text" style={{ letterSpacing: '1px' }}>
           <span style={{ fontWeight: 800 }}>KBS</span>
-          <span style={{ color: 'var(--cyan)', fontWeight: 400 }}>CLOUD</span>
-          <span style={{ color: 'var(--purple)', fontWeight: 600, fontSize: '0.8rem', marginLeft: '6px', fontFamily: 'var(--font-mono)' }}>HUB</span>
+          <span className="brand-cloud" style={{ color: 'var(--cyan)', fontWeight: 400 }}>CLOUD</span>
+          <span className="brand-hub" style={{ color: 'var(--purple)', fontWeight: 600, fontSize: '0.8rem', marginLeft: '6px', fontFamily: 'var(--font-mono)' }}>HUB</span>
         </span>
       </a>
 
@@ -74,22 +74,11 @@ export default function Header({
       <div className="navbar-actions">
         <button
           onClick={() => setPerformanceMode(!performanceMode)}
-          className="btn btn-secondary btn-sm"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            borderColor: performanceMode ? 'rgba(255, 123, 0, 0.4)' : 'var(--border-glass)',
-            color: performanceMode ? 'var(--orange)' : 'var(--text-secondary)',
-            background: performanceMode ? 'rgba(255, 123, 0, 0.08)' : 'rgba(255, 255, 255, 0.03)',
-            padding: '6px 12px',
-            height: '36px',
-            borderRadius: '18px'
-          }}
+          className={`btn btn-secondary btn-sm btn-perf-toggle ${performanceMode ? 'perf-active' : ''}`}
           title={performanceMode ? "Eco Mode Active: Click to restore visuals" : "Visual Mode Active: Click to reduce CPU usage"}
         >
           {performanceMode ? <ZapOff size={16} /> : <Zap size={16} />}
-          <span style={{ fontSize: '0.8rem', fontWeight: 600, fontFamily: 'var(--font-sans)' }}>
+          <span className="perf-toggle-text" style={{ fontSize: '0.8rem', fontWeight: 600, fontFamily: 'var(--font-sans)' }}>
             {performanceMode ? 'ECO ACTIVE' : 'VISUALS'}
           </span>
         </button>
@@ -114,7 +103,7 @@ export default function Header({
                 {user.displayName ? user.displayName[0].toUpperCase() : 'U'}
               </div>
               <span className="username">{user.displayName}</span>
-              <ChevronDown size={14} style={{ opacity: 0.6 }} />
+              <ChevronDown className="user-menu-chevron" size={14} style={{ opacity: 0.6 }} />
             </button>
 
             {showDropdown && (
@@ -152,8 +141,9 @@ export default function Header({
             )}
           </div>
         ) : (
-          <button className="btn btn-outline-cyan btn-sm" onClick={handleSignIn}>
-            <User size={16} /> Sign In
+          <button className="btn btn-outline-cyan btn-sm sign-in-btn" onClick={handleSignIn}>
+            <User size={16} />
+            <span className="sign-in-text">Sign In</span>
           </button>
         )}
       </div>
