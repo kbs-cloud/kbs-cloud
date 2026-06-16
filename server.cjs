@@ -87,6 +87,7 @@ app.use(cors({
 // 1. SSO Auth Callback handler
 app.get('/api/auth/callback', async (req, res) => {
   const { code } = req.query;
+  const isIframe = req.query.source === 'iframe';
 
   if (!code) {
     return res.status(400).send('Missing authorization code.');
@@ -140,10 +141,30 @@ app.get('/api/auth/callback', async (req, res) => {
       maxAge: 2 * 60 * 60 * 1000 // 2 hours
     });
 
+    if (isIframe) {
+      return res.send(`
+        <!DOCTYPE html>
+        <html>
+          <body>
+            <script>
+              if (window.opener) {
+                window.opener.postMessage({ type: 'SSO_LOGIN_SUCCESS' }, window.location.origin);
+              } else {
+                window.parent.postMessage({ type: 'SSO_LOGIN_SUCCESS' }, window.location.origin);
+              }
+            </script>
+          </body>
+        </html>
+      `);
+    }
+
     // Redirect user back to frontend home page
     res.redirect('/');
   } catch (error) {
     console.error('SSO token exchange failed:', error);
+    if (isIframe) {
+      return res.status(500).send('SSO exchange failed.');
+    }
     res.redirect('/?error=sso_failed');
   }
 });
@@ -189,6 +210,88 @@ app.post('/api/auth/logout', (req, res) => {
     secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
   });
   res.status(200).json({ success: true, message: 'Logged out from hub successfully.' });
+});
+
+// Helper to verify JWT signature using pure Node crypto module (offline verification)
+function verifyJWT(token, publicKeyPem) {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+
+    const [headerB64, payloadB64, signatureB64] = parts;
+    const data = headerB64 + '.' + payloadB64;
+    const signature = Buffer.from(signatureB64, 'base64url');
+
+    const verify = crypto.createVerify('SHA256');
+    verify.update(data);
+    const isValid = verify.verify(publicKeyPem, signature);
+
+    if (!isValid) return null;
+
+    const payloadJson = Buffer.from(payloadB64, 'base64url').toString('utf8');
+    return JSON.parse(payloadJson);
+  } catch (e) {
+    return null;
+  }
+}
+
+// 3.1 Back-channel logout endpoint for SLO (Asymmetric JWT verification)
+app.post('/api/auth/backchannel-logout', async (req, res) => {
+  const { logout_token } = req.body;
+  if (!logout_token) {
+    return res.status(400).json({ error: 'Missing logout_token.' });
+  }
+
+  try {
+    // 1. Fetch public key from auth server
+    const certsRes = await fetch(`${AUTH_SERVER_URL}/api/auth/certs`);
+    if (!certsRes.ok) {
+      throw new Error(`Failed to fetch certs from auth server: ${certsRes.status}`);
+    }
+    const { keys } = await certsRes.json();
+    const activeKey = keys?.find(k => k.kid === 'sso-key-1');
+    if (!activeKey || !activeKey.pem) {
+      throw new Error('Active public key not found in auth certs.');
+    }
+
+    // 2. Verify JWT signature
+    const payload = verifyJWT(logout_token, activeKey.pem);
+    if (!payload) {
+      return res.status(401).json({ error: 'Invalid logout token signature.' });
+    }
+
+    // 3. Validate claims
+    const now = Math.floor(Date.now() / 1000);
+    if (payload.iss !== 'kbs-auth') {
+      return res.status(401).json({ error: 'Invalid issuer.' });
+    }
+    if (payload.aud !== 'kbs-cloud') {
+      return res.status(401).json({ error: 'Invalid audience.' });
+    }
+    if (payload.exp < now) {
+      return res.status(401).json({ error: 'Logout token expired.' });
+    }
+
+    const email = payload.sub;
+    if (!email) {
+      return res.status(400).json({ error: 'Missing subject (email).' });
+    }
+
+    // 4. Invalidate sessions
+    let deletedCount = 0;
+    for (const [sid, data] of sessions.entries()) {
+      if (data.email === email) {
+        sessions.delete(sid);
+        deletedCount++;
+      }
+    }
+
+    console.log(`[Back-Channel Logout] Cleared ${deletedCount} local hub sessions for ${email}`);
+    res.status(200).json({ success: true, message: 'Sessions cleared successfully.' });
+  } catch (error) {
+    console.error('[Back-Channel Logout] Verification failed:', error.message);
+    res.status(400).json({ error: error.message });
+  }
 });
 
 // --- HUB STOREFRONT & APP CATALOG ENDPOINTS ---

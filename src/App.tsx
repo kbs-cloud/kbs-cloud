@@ -9,6 +9,7 @@ import ProfileDashboard from './components/ProfileDashboard';
 import DevPortal from './components/DevPortal';
 import GameDetailModal from './components/GameDetailModal';
 import { Gamepad2, Layers, Settings, User as UserIcon } from 'lucide-react';
+import { startSSOBackgroundCheck } from './shared/auth/sso-helper';
 
 export default function App() {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -77,8 +78,69 @@ export default function App() {
 
   // Check login session & fetch games list
   useEffect(() => {
-    fetchSession();
+    let active = true;
+    let cleanupBackgroundCheck: (() => void) | null = null;
+
+    const checkSessionAndAuth = () => {
+      fetch('/api/auth/me')
+        .then(res => {
+          if (res.ok) return res.json();
+          throw new Error('Unauthorized');
+        })
+        .then(data => {
+          if (!active) return;
+          if (data.success && data.user) {
+            setUser(data.user);
+          } else {
+            setUser(null);
+            cleanupBackgroundCheck = startSSOBackgroundCheck({
+              clientId: 'kbs-cloud',
+              onSuccess: () => {
+                fetch('/api/auth/me')
+                  .then(res => res.json())
+                  .then(data => {
+                    if (data.success && data.user && active) {
+                      setUser(data.user);
+                    }
+                  })
+                  .catch(() => {});
+              }
+            });
+          }
+        })
+        .catch(() => {
+          if (!active) return;
+          setUser(null);
+          cleanupBackgroundCheck = startSSOBackgroundCheck({
+            clientId: 'kbs-cloud',
+            onSuccess: () => {
+              fetch('/api/auth/me')
+                .then(res => res.json())
+                .then(data => {
+                  if (data.success && data.user && active) {
+                    setUser(data.user);
+                  }
+                })
+                .catch(() => {});
+            }
+          });
+        })
+        .finally(() => {
+          if (active) {
+            setLoadingSession(false);
+          }
+        });
+    };
+
+    checkSessionAndAuth();
     fetchAppsList();
+
+    return () => {
+      active = false;
+      if (cleanupBackgroundCheck) {
+        cleanupBackgroundCheck();
+      }
+    };
   }, []);
 
   const getAuthServerUrl = () => {
