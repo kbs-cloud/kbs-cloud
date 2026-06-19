@@ -1,4 +1,4 @@
-import { Gamepad2, ChevronDown, User, Settings, Layers, LogOut, Zap, ZapOff } from 'lucide-react';
+import { ChevronDown, User, Settings, Layers, LogOut, Zap, ZapOff } from 'lucide-react';
 import type { UserProfile } from '../types';
 
 export interface HeaderProps {
@@ -29,7 +29,7 @@ export default function Header({
   return (
     <header className="navbar">
       <a href="/" className="navbar-brand" onClick={(e) => { e.preventDefault(); setActiveTab('store'); }}>
-        <Gamepad2 className="logo-glow" size={32} />
+        <img src="/logo.png" className="logo-glow" style={{ height: '32px', width: '32px', borderRadius: '4px', objectFit: 'cover' }} alt="KBS Cloud" />
         <span className="navbar-brand-text" style={{ letterSpacing: '1px' }}>
           <span style={{ fontWeight: 800 }}>KBS</span>
           <span className="brand-cloud" style={{ color: 'var(--cyan)', fontWeight: 400 }}>CLOUD</span>

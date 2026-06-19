@@ -1,0 +1,3010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="KBS Cloud Games pitch decks for Gridlock Neon, Alchemist's Crucible, and the entire Game Incubator collection. Features interactive concept simulators, blueprints, and tech stack details.">
+  <title>KBS Cloud Games: Full Pitch Deck Catalog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;800;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Global Reset & Styling */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-gradient: radial-gradient(circle at 50% 50%, #0c081f 0%, #030107 100%);
+      --accent-color: #ff007f; /* Neon pink */
+      --accent-glow: rgba(255, 0, 127, 0.5);
+      --secondary-color: #00f0ff; /* Neon cyan */
+      --secondary-glow: rgba(0, 240, 255, 0.4);
+      --text-color: #e2e8f0;
+      --text-muted: #8b9bb4;
+      --panel-bg: rgba(14, 11, 31, 0.75);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --sidebar-bg: rgba(7, 5, 16, 0.9);
+      --title-font: 'Orbitron', sans-serif;
+      --glow-shadow: 0 0 15px var(--accent-glow);
+      --glow-shadow-secondary: 0 0 12px var(--secondary-glow);
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-color);
+    }
+
+    html, body {
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text-color);
+      background: var(--bg-gradient);
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Container Layout */
+    .app-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 60px);
+      min-height: 0; /* Prevent child content from stretching container height */
+      position: relative;
+    }
+
+    /* Header */
+    .header {
+      height: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      background: #04020a;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 10;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      font-size: 1.4rem;
+      text-shadow: 0 0 10px var(--accent-color);
+    }
+
+    .logo-text {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #fff;
+      font-size: 1.15rem;
+    }
+
+    .logo-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+      padding-left: 0.75rem;
+      font-weight: 500;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      width: 340px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      flex-shrink: 0;
+      z-index: 5;
+    }
+
+    .search-container {
+      padding: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.65rem 1rem;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 8px rgba(255, 0, 127, 0.2);
+    }
+
+    .sidebar-menu {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 0;
+    }
+
+    .menu-section-header {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--accent-color);
+      letter-spacing: 1.5px;
+      padding: 0.8rem 1.5rem 0.4rem 1.5rem;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    .menu-list {
+      list-style: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .menu-item {
+      padding: 0.6rem 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+    }
+
+    .menu-item:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .menu-item.active {
+      color: #fff;
+      background: rgba(255, 0, 127, 0.06);
+      border-left-color: var(--accent-color);
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .game-id-badge {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .menu-item.active .game-id-badge {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+      color: #000;
+      font-weight: 900;
+    }
+
+    /* Main Content Area */
+    .content-area {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      height: 100%;
+      min-height: 0; /* Prevent child contents from stretching grid height */
+      overflow: hidden;
+      background: var(--bg-gradient);
+    }
+
+    @media (max-width: 1080px) {
+      .content-area {
+        grid-template-columns: 1fr;
+      }
+      .preview-column {
+        display: none !important;
+      }
+    }
+
+    /* Left detail column */
+    .detail-column {
+      padding: 2rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      height: 100%;
+      min-height: 0; /* Prevent flex/grid stretching past viewport */
+    }
+
+    /* Right preview column */
+    .preview-column {
+      padding: 2rem;
+      border-left: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      height: 100%;
+      min-height: 0; /* Prevent flex/grid stretching past viewport */
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    /* Detail Blocks */
+    .pitch-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1rem;
+    }
+
+    .pitch-header-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .pitch-badge {
+      background: rgba(255, 0, 127, 0.1);
+      border: 1px solid var(--accent-color);
+      color: var(--accent-color);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: bold;
+      text-shadow: 0 0 5px var(--accent-glow);
+    }
+
+    .pitch-title {
+      font-family: var(--title-font);
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .pitch-genre {
+      font-size: 1.05rem;
+      color: var(--secondary-color);
+      font-weight: 500;
+      margin-top: 0.25rem;
+    }
+
+    .section-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .section-card h3 {
+      font-family: var(--title-font);
+      color: var(--accent-color);
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+      text-shadow: 0 0 10px var(--accent-glow);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.4rem;
+      letter-spacing: 0.5px;
+    }
+
+    .section-card p {
+      line-height: 1.6;
+      font-size: 0.95rem;
+      color: var(--text-color);
+    }
+
+    .loop-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .loop-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .loop-number {
+      background: var(--accent-color);
+      color: #000;
+      font-family: var(--title-font);
+      font-weight: 900;
+      font-size: 0.75rem;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .loop-text {
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .tech-tag {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.5rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-color);
+      transition: all 0.3s;
+    }
+
+    .tech-tag:hover {
+      border-color: var(--secondary-color);
+      box-shadow: var(--glow-shadow-secondary);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Right Preview Container */
+    .preview-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      height: 100%;
+      min-height: 0; /* Prevent stretching past container bounds */
+      overflow: hidden;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.5rem;
+    }
+
+    .preview-header h4 {
+      font-family: var(--title-font);
+      font-size: 1rem;
+      color: #fff;
+    }
+
+    .live-badge {
+      background: rgba(22, 163, 74, 0.15);
+      border: 1px solid #22c55e;
+      color: #4ade80;
+      padding: 0.15rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.65rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      animation: indicator-pulse 2.2s infinite;
+    }
+
+    @keyframes indicator-pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    .canvas-box {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      background: #020205;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      min-height: 250px;
+    }
+
+    .canvas-box canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Gridlock overlay rules */
+    .demo-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(4, 4, 10, 0.88);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem;
+      text-align: center;
+      z-index: 5;
+    }
+
+    .demo-start-btn {
+      background: var(--accent-color);
+      color: #000;
+      border: none;
+      padding: 0.75rem 1.75rem;
+      font-family: var(--title-font);
+      font-weight: 900;
+      font-size: 0.9rem;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: var(--glow-shadow);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .demo-start-btn:hover {
+      transform: scale(1.04);
+      box-shadow: 0 0 25px var(--accent-color);
+    }
+
+    .demo-overlay-subtext {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    .demo-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 0.8rem;
+      gap: 1rem;
+    }
+
+    .demo-stat {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .demo-stat span {
+      color: var(--secondary-color);
+    }
+
+    .audio-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .audio-btn:hover {
+      border-color: var(--accent-color);
+      box-shadow: var(--glow-shadow);
+    }
+
+    /* Alchemist Cauldron visual slot styles */
+    .cauldron-area {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+
+    .cauldron-view {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      background: radial-gradient(circle at 50% 120%, #111d14 0%, #030604 100%);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .cauldron-canvas {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+
+    .cauldron-element {
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: 6px solid #221a14;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9), 0 0 20px rgba(82, 183, 136, 0.2);
+      background: #090c09;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+    }
+
+    .cauldron-glow-bubble {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      right: 5px;
+      bottom: 5px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(82, 183, 136, 0.3) 0%, transparent 70%);
+      animation: boil-bubble 2.5s infinite alternate ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes boil-bubble {
+      0% { transform: scale(0.95); opacity: 0.4; }
+      100% { transform: scale(1.05); opacity: 0.7; }
+    }
+
+    .cauldron-slots {
+      display: flex;
+      gap: 0.5rem;
+      z-index: 3;
+    }
+
+    .c-slot {
+      width: 38px;
+      height: 38px;
+      border: 2px dashed rgba(212, 163, 115, 0.35);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      background: rgba(0,0,0,0.4);
+      font-weight: bold;
+    }
+
+    .c-slot.filled {
+      border-style: solid;
+      border-color: var(--accent-color);
+      background: rgba(212, 163, 115, 0.12);
+      font-size: 1.25rem;
+    }
+
+    .alchemy-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .alchemy-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: 'Cinzel', serif;
+      font-weight: bold;
+    }
+
+    .alchemy-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+
+    .a-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 0.5rem 0.25rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .a-card:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .card-f:hover { border-color: #ef4444; }
+    .card-w:hover { border-color: #3b82f6; }
+    .card-e:hover { border-color: #10b981; }
+    .card-a:hover { border-color: #06b6d4; }
+
+    .a-card-emoji { font-size: 1.2rem; }
+    .a-card-name { font-size: 0.7rem; font-weight: bold; color: #fff; }
+
+    .alchemy-logs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    .alchemy-log-box {
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 0.65rem;
+      background: rgba(0,0,0,0.15);
+    }
+
+    .alchemy-log-box h5 {
+      color: var(--accent-color);
+      font-family: 'Cinzel', serif;
+      margin-bottom: 0.25rem;
+    }
+
+    .alchemy-recipes {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      max-height: 80px;
+      overflow-y: auto;
+    }
+
+    .alchemy-recipes li {
+      color: var(--text-muted);
+      position: relative;
+      padding-left: 10px;
+    }
+
+    .alchemy-recipes li::before {
+      content: '🔒';
+      position: absolute;
+      left: 0;
+      font-size: 0.6rem;
+    }
+
+    .alchemy-recipes li.unlocked {
+      color: var(--secondary-color);
+    }
+
+    .alchemy-recipes li.unlocked::before {
+      content: '✓';
+      color: var(--secondary-color);
+      font-weight: bold;
+    }
+
+    .alchemy-log-msg {
+      min-height: 30px;
+      line-height: 1.4;
+      margin-bottom: 0.35rem;
+    }
+
+    .alchemy-reset-btn {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #fff;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      transition: all 0.3s;
+    }
+
+    .alchemy-reset-btn:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+
+    /* Blueprints layout */
+    .blueprint-view {
+      display: none;
+      flex-direction: column;
+      gap: 1.5rem;
+      height: 100%;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .blueprint-diagram {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .diagram-step {
+      width: 100%;
+      max-width: 320px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .diagram-step h5 {
+      color: var(--secondary-color);
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .diagram-step p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .diagram-arrow {
+      font-size: 1rem;
+      color: var(--accent-color);
+      text-shadow: var(--glow-shadow);
+      margin: -0.25rem 0;
+    }
+
+    /* General instructions banner */
+    .banner {
+      background: linear-gradient(90deg, rgba(255, 0, 127, 0.1), rgba(0, 240, 255, 0.1));
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .banner-icon {
+      font-size: 1.25rem;
+    }
+
+    /* Floaty Text inside canvas */
+    .c-floaty {
+      position: absolute;
+      color: var(--secondary-color);
+      font-weight: bold;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      pointer-events: none;
+      animation: c-float-up 0.8s ease-out forwards;
+    }
+
+    @keyframes c-float-up {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-40px); opacity: 0; }
+    }
+
+    /* Mobile Navigation Tab Bar */
+    .mobile-tab-bar {
+      display: none; /* Hidden on desktop */
+      height: 56px;
+      background: #04020a;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      justify-content: space-around;
+      align-items: center;
+      z-index: 20;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    .mobile-tab-btn {
+      flex: 1;
+      height: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--title-font);
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .mobile-tab-btn.active {
+      color: var(--accent-color);
+      text-shadow: 0 0 10px var(--accent-glow);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .mobile-tab-icon {
+      font-size: 1.1rem;
+    }
+
+    /* Mobile Responsive Layout Settings */
+    @media (max-width: 960px) {
+      body {
+        overflow: hidden; /* Lock viewport */
+        height: 100vh;
+      }
+
+      .header {
+        height: 60px;
+        padding: 0 1rem;
+      }
+
+      .logo-subtitle {
+        display: none; /* Hide subtitle to fit screen width */
+      }
+
+      .app-container {
+        flex-direction: column;
+        height: calc(100vh - 60px);
+        overflow: hidden;
+      }
+
+      /* Desktop layouts display hidden by default */
+      .sidebar {
+        width: 100% !important;
+        height: 100% !important;
+        display: none;
+        border-right: none;
+      }
+
+      .content-area {
+        width: 100% !important;
+        height: 100% !important;
+        grid-template-columns: 1fr !important;
+        display: none;
+      }
+
+      .detail-column {
+        width: 100% !important;
+        height: 100% !important;
+        display: none;
+        padding: 1.25rem;
+      }
+
+      .preview-column {
+        width: 100% !important;
+        height: 100% !important;
+        display: none !important; /* Force override */
+        border-left: none;
+        padding: 1.25rem;
+      }
+
+      .preview-card {
+        padding: 1.25rem;
+        height: 100%;
+        overflow-y: auto; /* Enable internal scrollbar for long cauldron/demo settings */
+      }
+
+      /* Show only active tab content */
+      .app-container.active-tab-menu .sidebar {
+        display: flex !important;
+      }
+
+      .app-container.active-tab-specs .content-area {
+        display: block !important;
+      }
+      .app-container.active-tab-specs .detail-column {
+        display: flex !important;
+      }
+
+      .app-container.active-tab-preview .content-area {
+        display: block !important;
+      }
+      .app-container.active-tab-preview .preview-column {
+        display: flex !important;
+      }
+
+      .mobile-tab-bar {
+        display: flex;
+      }
+
+      /* Scale down detail blocks fonts for compact screens */
+      .pitch-title {
+        font-size: 1.6rem;
+      }
+      
+      .canvas-box {
+        min-height: 220px; /* Squeeze slightly for mobile heights */
+      }
+
+      .alchemy-logs {
+        grid-template-columns: 1fr; /* Stack logs vertically on mobile */
+      }
+      .cauldron-area {
+        height: auto !important;
+        overflow: visible !important;
+        flex: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="theme-gridlock">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-area">
+      <span class="logo-icon">⚡</span>
+      <span class="logo-text">KBS CLOUD</span>
+      <span class="logo-subtitle">GAME INCUBATOR DESIGN SPECIFICATIONS</span>
+    </div>
+  </div>
+
+  <!-- App Container -->
+  <div class="app-container">
+
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="search-container">
+        <input type="text" class="search-input" id="search-bar" placeholder="Search game ideas or technology..." oninput="filterMenu()">
+      </div>
+      <div class="sidebar-menu">
+        <div class="menu-section-header">Volume 1: Game Incubator</div>
+        <ul class="menu-list" id="volume-1-list">
+          <!-- Populated by JS -->
+        </ul>
+
+        <div class="menu-section-header">Volume 2: Shared Ecosystem</div>
+        <ul class="menu-list" id="volume-2-list">
+          <!-- Populated by JS -->
+        </ul>
+
+        <div class="menu-section-header">Technical Blueprints</div>
+        <ul class="menu-list">
+          <li class="menu-item" id="menu-blue-sso" onclick="switchBlueprint('sso')">
+            <span class="game-id-badge">SSO</span> SSO Authentication Flow
+          </li>
+          <li class="menu-item" id="menu-blue-sync" onclick="switchBlueprint('sync')">
+            <span class="game-id-badge">SYNC</span> Multiplayer Polling Sync
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-area">
+      
+      <!-- Left Detail Column -->
+      <div class="detail-column" id="details-panel">
+        <!-- Rendered dynamically by JS -->
+      </div>
+
+      <!-- Right Preview Column -->
+      <div class="preview-column">
+        
+        <!-- Game Preview Panel -->
+        <div class="preview-card" id="game-preview-panel">
+          <div class="preview-header">
+            <h4 id="preview-panel-title">Interactive Game Simulator</h4>
+            <div class="live-badge">PREVIEW ACTIVE</div>
+          </div>
+
+          <!-- Standard Canvas Box -->
+          <div class="canvas-box" id="std-canvas-box">
+            <canvas id="live-canvas"></canvas>
+            
+            <!-- Gridlock overlay screen -->
+            <div class="demo-overlay" id="grid-demo-overlay" style="display: none;">
+              <button class="demo-start-btn" onclick="triggerStartGridlock()">Start Interactive Demo</button>
+              <p class="demo-overlay-subtext">Use A/D or Arrow keys to shift lanes.<br>Toggle synth audio for real-time beat pulsing!</p>
+            </div>
+          </div>
+
+          <!-- Alchemist Cauldron Box -->
+          <div class="cauldron-area" id="cauldron-preview-box">
+            <div class="cauldron-view">
+              <canvas class="cauldron-canvas" id="alch-cauldron-canvas"></canvas>
+              <div class="cauldron-element">
+                <div class="cauldron-glow-bubble"></div>
+                <div class="cauldron-slots">
+                  <div class="c-slot" id="slot-c1">Empty</div>
+                  <div class="c-slot" id="slot-c2">Empty</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="alchemy-controls">
+              <div class="alchemy-title">Ingredients Cauldron:</div>
+              <div class="alchemy-cards">
+                <div class="a-card card-f" onclick="triggerAddAlchemist('Fire', '🔥')">
+                  <div class="a-card-emoji">🔥</div>
+                  <div class="a-card-name">Fire</div>
+                </div>
+                <div class="a-card card-w" onclick="triggerAddAlchemist('Water', '💧')">
+                  <div class="a-card-emoji">💧</div>
+                  <div class="a-card-name">Water</div>
+                </div>
+                <div class="a-card card-e" onclick="triggerAddAlchemist('Earth', '🌱')">
+                  <div class="a-card-emoji">🌱</div>
+                  <div class="a-card-name">Earth</div>
+                </div>
+                <div class="a-card card-a" onclick="triggerAddAlchemist('Air', '💨')">
+                  <div class="a-card-emoji">💨</div>
+                  <div class="a-card-name">Air</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="alchemy-logs">
+              <div class="alchemy-log-box">
+                <h5>Recipe Book</h5>
+                <ul class="alchemy-recipes" id="alch-recipe-book">
+                  <li id="rec-alch-lava">Lava (Fire + Earth)</li>
+                  <li id="rec-alch-steam">Steam (Fire + Water)</li>
+                  <li id="rec-alch-lightning">Lightning (Fire + Air)</li>
+                  <li id="rec-alch-mud">Mud (Water + Earth)</li>
+                  <li id="rec-alch-mist">Mist (Water + Air)</li>
+                  <li id="rec-alch-dust">Dust (Earth + Air)</li>
+                </ul>
+              </div>
+              <div class="alchemy-log-box">
+                <h5>Crucible Status</h5>
+                <div class="alchemy-log-msg" id="alch-log-text">Ready. Select ingredients...</div>
+                <button class="alchemy-reset-btn" onclick="triggerResetAlchemist()">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom interactive bar -->
+          <div class="demo-bar" id="preview-control-bar">
+            <div class="demo-stat" id="preview-stat-1">Score: <span id="stat-val-1">0</span></div>
+            <div class="demo-stat" id="preview-stat-2">Shields: <span id="stat-val-2">100%</span></div>
+            <button class="audio-btn" id="rhythm-audio-toggle" onclick="triggerToggleGridlockAudio()">🔈 Enable Audio</button>
+          </div>
+        </div>
+
+        <!-- Technical Blueprint Flow -->
+        <div class="blueprint-view" id="blueprint-panel">
+          <div class="banner">
+            <span class="banner-icon">ℹ️</span>
+            <div>Standardized specifications integration blueprints used across all Volume 2 Connected Ecosystem titles.</div>
+          </div>
+
+          <!-- SSO Flow diagram -->
+          <div class="blueprint-diagram" id="bp-sso-diag">
+            <h4 style="font-family:'Orbitron';color:#fff;font-size:0.95rem;">SSO Authentication Loop</h4>
+            <div class="diagram-step">
+              <h5>1. Login Trigger</h5>
+              <p>User clicks 'Login with KBS SSO' on the client dashboard.</p>
+            </div>
+            <div class="diagram-arrow">▼</div>
+            <div class="diagram-step">
+              <h5>2. Auth Redirect</h5>
+              <p>Redirects user to Auth Server /login?client_id=game_id</p>
+            </div>
+            <div class="diagram-arrow">▼</div>
+            <div class="diagram-step">
+              <h5>3. Token Handshake</h5>
+              <p>SSO sends authorization code back to Game Backend, which exchanges it for User JWT Profile.</p>
+            </div>
+            <div class="diagram-arrow">▼</div>
+            <div class="diagram-step">
+              <h5>4. Session Secure</h5>
+              <p>Session serializes to SQLite DB. Writes secure HttpOnly session_id and csrf_token cookies to Client.</p>
+            </div>
+          </div>
+
+          <!-- SYNC Flow diagram -->
+          <div class="blueprint-diagram" id="bp-sync-diag" style="display:none;">
+            <h4 style="font-family:'Orbitron';color:#fff;font-size:0.95rem;">Multiplayer Polling Loop</h4>
+            <div class="diagram-step">
+              <h5>1. Heartbeat Polling</h5>
+              <p>Clients send POST to /presence every 3-5 seconds to refresh lobby status and retrieve active player lists.</p>
+            </div>
+            <div class="diagram-arrow">▼</div>
+            <div class="diagram-step">
+              <h5>2. Action Dispatch</h5>
+              <p>Player actions are dispatched via POST /action which updates SQLite row state machines.</p>
+            </div>
+            <div class="diagram-arrow">▼</div>
+            <div class="diagram-step">
+              <h5>3. State Sync</h5>
+              <p>Connected players poll GET /state every 1-2 seconds, fetching the updated JSON row from SQLite games table.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Mobile Navigation Tab Bar -->
+    <div class="mobile-tab-bar" id="mobile-tabs">
+      <button class="mobile-tab-btn active" id="tab-btn-menu" onclick="switchMobileTab('menu')">
+        <span class="mobile-tab-icon">📋</span>
+        <span>Menu</span>
+      </button>
+      <button class="mobile-tab-btn" id="tab-btn-specs" onclick="switchMobileTab('specs')">
+        <span class="mobile-tab-icon">📝</span>
+        <span>Specs</span>
+      </button>
+      <button class="mobile-tab-btn" id="tab-btn-preview" onclick="switchMobileTab('preview')">
+        <span class="mobile-tab-icon">🎮</span>
+        <span id="mobile-tab-preview-label">Simulator</span>
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    // -------------------------------------------------------------
+    // Pitch Deck Dataset (Games 1 to 20)
+    // -------------------------------------------------------------
+    const gamesData = [
+      {
+        id: 1,
+        volume: 1,
+        title: "Cyberpunk Hacking Simulator",
+        genre: "Command-line Narrative / Node-link Grid Puzzle",
+        visuals: "Sleek dark terminal, neon green and purple vector interfaces, glassmorphism windows, custom scanlines, terminal text print effect.",
+        loops: [
+          "Parse text commands to scan, breach, and decrypt target nodes.",
+          "Complete node-link bypass puzzles: Rotate logic gates to redirect power from a source to a core before an intrusion detection firewall catches you.",
+          "Extract narrative logs revealing corporate espionage."
+        ],
+        controls: "Keyboard (terminal CLI input) + Mouse (rotating logic nodes).",
+        tech: ["Custom HTML5 Canvas Renderer", "Web Audio Synthesizer", "CRT Scanline CSS Shaders"],
+        mockup: "Left sidebar contains the directory tree and active nodes. Center is the visual node grid. Bottom is a scrolling console terminal."
+      },
+      {
+        id: 2,
+        volume: 1,
+        title: "Orbit Weaver",
+        genre: "Gravity Physics Puzzle",
+        visuals: "Dark star-studded background, planet spheres with orbital paths, gravity field gradient rings, vector velocity lines.",
+        loops: [
+          "Adjust launch angle and velocity vector of a space probe.",
+          "Launch probe; watch it bend under the gravitational influence of planets and black holes.",
+          "Collect cosmic dust and land/orbit target stations with zero fuel remaining."
+        ],
+        controls: "Mouse drag (to set vector) + Spacebar (to launch/engage thruster).",
+        tech: ["Matter.js Physics / Custom Newton Gravity Solver", "HTML5 Canvas viewport", "Trajectory Prediction Math"],
+        mockup: "A minimalist starmap. Top bar shows fuel levels and goals. Click-and-drag creates a dotted trajectory path showing gravitational predictions."
+      },
+      {
+        id: 3,
+        volume: 1,
+        title: "Alchemist's Crucible",
+        genre: "Elemental Crafting Deck-Builder",
+        visuals: "Mystical wood/gold background, interactive card elements with floating particles, animated bubbling glass crucible, smooth drag physics.",
+        loops: [
+          "Draw 5 cards per turn representing basic elements (Fire 🔥, Water 💧, Earth 🌱, Air 💨).",
+          "Drag cards into the central Crucible cauldron to combine them (e.g. Fire + Earth = Lava; Water + Air = Mist).",
+          "Use created compounds to feed the cauldron, unlock recipes, and defend against entropy cards."
+        ],
+        controls: "Drag-and-drop / click card interactions.",
+        tech: ["HTML5 Drag & Drop API", "CSS 3D Card Flipping Engine", "Canvas Particle System"],
+        mockup: "Cards sit at the bottom in a radial hand. Center is the glowing Crucible. Left side shows recipe book unlocked states. Right side shows active entropy level."
+      },
+      {
+        id: 4,
+        volume: 1,
+        title: "Gridlock Neon",
+        genre: "Rhythm-based Cyber-Runner",
+        visuals: "Synthwave grid expanding to a neon horizon, neon pink obstacles, glowing blue collectible notes, grid pulse matching sound bass.",
+        loops: [
+          "Dodge shifting hurdles by sliding between 3 lanes on a grid.",
+          "Slide/jump in sync with background music beats.",
+          "Collect memory shards to power up shields and multiply scores."
+        ],
+        controls: "Arrow Keys / WASD keys (Lane swaps).",
+        tech: ["Web Audio API Real-time Analyzers", "HTML5 Canvas 2D engine", "Perspective 3D Projection"],
+        mockup: "Infinite perspective grid. The player character is a sleek lightcycle at the bottom center. Obstacles slide down from the horizon."
+      },
+      {
+        id: 5,
+        volume: 1,
+        title: "Subterfuge",
+        genre: "Turn-based Stealth Tactics",
+        visuals: "Blueprint layout scheme, soft dynamic shadows indicating guard vision cones, glowing red lasers, terminal security panels.",
+        loops: [
+          "Move step-by-step on a grid viewport.",
+          "Study guard patrol patterns, distract them using noise emitters (coins, whistles), or disable security cameras.",
+          "Reach the secure vault, download files, and escape to the extraction zone."
+        ],
+        controls: "Mouse (click tile to move) or Keyboard (Arrow keys).",
+        tech: ["Canvas 2D Grid Engine", "Vision Cone Raycasting Math", "A* Pathfinding System"],
+        mockup: "Blueprint map grid. Blue grid lines, yellow icons for items, green vision cones for guards, orange vision cone for the player."
+      },
+      {
+        id: 6,
+        volume: 1,
+        title: "Eco-Dome",
+        genre: "Zen Ecosystem Simulation",
+        visuals: "Soft pastel isometric grid, glass dome framing, cute low-poly vegetation, rainfall animations.",
+        loops: [
+          "Seed plants (grass, bushes, trees) to generate moisture and oxygen values.",
+          "Balance the food chain (insects, herbivores, predators) to maintain ecosystem equilibrium.",
+          "Adjust temperature and hydration variables to trigger weather cycles."
+        ],
+        controls: "Left click to place seeds/structures, mouse drag to pan map.",
+        tech: ["Isometric Coordinate Projection", "Day-Night cycle CSS transitions", "Local equilibrium simulation matrices"],
+        mockup: "An isometric hexagonal grid of tiles surrounded by a glass dome outline. Bottom dashboard lists plant types, water level meters, and temperature dials."
+      },
+      {
+        id: 7,
+        volume: 1,
+        title: "Hyper-Tycoon: Neon Arcade",
+        genre: "Incremental/Idle Arcade Manager",
+        visuals: "Pixel art or retro neon panels, glowing active progress bars, detailed stat dashboards, glassmorphic upgrade cards.",
+        loops: [
+          "Install retro arcade cabinets (Pac-man, Space Invaders clones) that generate passive coin points.",
+          "Invest in marketing, neon signs, and concessions to boost customer spawn rates.",
+          "Play mini-games inside cabinets to temporarily double income speeds."
+        ],
+        controls: "Mouse click/tap interactions.",
+        tech: ["LocalStorage state serialization", "Responsive CSS Flexbox grid layout", "Embedded mini-canvas games"],
+        mockup: "Arcade floor plan at the top, upgrade storefront cards at the bottom, live ticker of arcade earnings on the left."
+      },
+      {
+        id: 8,
+        volume: 1,
+        title: "Voxel Dungeon",
+        genre: "Isometric 3D Dungeon Crawler",
+        visuals: "Low-poly voxel styling, dark dungeon bricks, warm torch light cast, glowing chests.",
+        loops: [
+          "Explore random room chambers populated with skeleton archers and slimes.",
+          "Loot swords, shields, and spell scrolls from dungeon chests.",
+          "Locate the dungeon key to open the exit trapdoor."
+        ],
+        controls: "WASD/Arrow keys for movement, Spacebar to attack, Mouse to target spells.",
+        tech: ["Three.js (WebGL renderer)", "Binary Space Partitioning Map Generator", "AABB 3D Collision solver"],
+        mockup: "3D viewport canvas. Bottom bar has health/mana globes, inventory slots. Top right corner contains a simple mini-map."
+      },
+      {
+        id: 9,
+        volume: 1,
+        title: "Stellar Colony: 100 Seconds",
+        genre: "Stress Real-Time Colony Management",
+        visuals: "Sci-fi ship control console, circular status dials, red warning lights, vector ship schematics.",
+        loops: [
+          "Manage a spaceship for exactly 100 seconds of intense breakdown events (meteor hits, oxygen leaks, generator failures).",
+          "Dispatch crew members to damaged rooms, route auxiliary power grids, and toggle fire suppression.",
+          "Survive the countdown timer with at least one hull integrity point remaining."
+        ],
+        controls: "Mouse drag-and-drop crew members, toggle switches.",
+        tech: ["State-machine timer loops", "Canvas visualizer gauges", "Satisfying alert sound effects"],
+        mockup: "Large central schematics diagram of the spaceship. Clicking rooms allows sending crew. Flashing meters show oxygen, power, and hull integrity."
+      },
+      {
+        id: 10,
+        volume: 1,
+        title: "Chroma Shift",
+        genre: "Color-Mixing Puzzle Platformer",
+        visuals: "Jet-black background, ultra-bright neon red, yellow, and blue elements, dynamic lighting/glow filters.",
+        loops: [
+          "Control a square character who can shift colors (Red, Blue, Yellow).",
+          "Match character color with block colors to pass through lasers or land on matching platforms.",
+          "Combine colors (e.g. Red + Blue = Purple) to trigger complex multi-colored switches."
+        ],
+        controls: "Arrow keys (move) + Space (jump) + Z/X/C (color swap triggers).",
+        tech: ["Canvas 2D collision loop", "Glow-filter rendering layers", "Color combination matrix logic"],
+        mockup: "Level screen with neon pathways. Colored barriers block progress. Top indicator displays current color and color combination wheels."
+      },
+      {
+        id: 11,
+        volume: 2,
+        title: "Pipe Fever",
+        genre: "Tile-Matching Route Planner / Puzzle Action",
+        inspiration: "Pipe Dream / Pipe Works",
+        visuals: "Neon-copper pipes, bright brass gauges, glassmorphic dashboards, and glowing fluid canvas shaders.",
+        loops: [
+          "A starting node begins charging pressurized fluid. A countdown timer displays 'Time to Flow'.",
+          "The player is given a queue of randomized pipe shapes (Straight, Elbow, Cross, T-Junction).",
+          "Place pipes on a grid to redirect the flowing liquid toward a designated exit tile.",
+          "Earn points per pipe length traversed. A blow-out occurs if fluid reaches an open pipe end."
+        ],
+        controls: "Left Click / Tap (place), Right Click / Space (rotate), Esc (pause).",
+        tech: ["HTML5 Canvas Fluid Shader", "Randomized queue arrays", "A* Connection validator"],
+        sso: "Leaderboards, Achievement: 'pipe_master_gold' (loops of 30+ pipes), Achievement: 'leak_preventer' (saved near-leaks).",
+        multiplayer: "Versus Mode (sabotage tiles by placing blocks), Co-Op Mode (shared grid, P1 even rows, P2 odd rows, shared stream)."
+      },
+      {
+        id: 12,
+        volume: 2,
+        title: "Micro-Chip's Journey",
+        genre: "2D Grid Puzzle / Tile-based Maze Explorer",
+        inspiration: "Chip's Challenge",
+        visuals: "Motherboard circuit layout, neon tracers on copper buses, cute animated microchip pins, circuit spark hazards.",
+        loops: [
+          "Explore a 2D tile grid room to collect a set number of memory RAM chips.",
+          "Solve path puzzles: Push heavy battery cores onto logic plates to complete electrical connections.",
+          "Evade patrolling computer bugs (spark beetles, logic glitches).",
+          "Collect keycard tokens to unlock firewall gates and step into the port gateway."
+        ],
+        controls: "WASD / Arrow Keys (move), E / Space (interact).",
+        tech: ["Grid movement validation", "Level JSON deserializer", "Bug patrol AABB triggers"],
+        sso: "Fastest completion times, level editor to share custom maps linked to SSO profile, Achievement: 'circuit_bender' (no resistor traps triggered).",
+        multiplayer: "Co-Op Mode: Two chips ('Core 0' and 'Core 1') must collaborate. Core 0 traverses blue lasers; Core 1 traverses red lasers. In-state lock flag handles coordinate collisions."
+      },
+      {
+        id: 13,
+        volume: 2,
+        title: "RetroSweeper",
+        genre: "Grid Logic Puzzle / Hazard Detection",
+        inspiration: "Minesweeper",
+        visuals: "Cyberpunk terminal dark-mode style, metallic alloy plates, neon-glowing numbers, holographic warning beacons.",
+        loops: [
+          "Reveal cells. If they contain mines, detonate and trigger a CRT screen glitch shake.",
+          "Safe cells reveal numbers indicating adjacent mines.",
+          "Flag mines and sweep the entire board to win."
+        ],
+        controls: "Left Click (reveal), Right Click (flag), Double Click (chord sweep).",
+        tech: ["Recursive grid reveal algorithm", "Screen shaking/glitch Canvas matrices", "Timer score tracking"],
+        sso: "Total mines swept stats, best times (Beginner, Intermediate, Advanced), Achievement: 'flawless_sweep' (16x16 grid cleared with 0 wrong flags).",
+        multiplayer: "Versus Speed-Sweep (race on identical grids, detonating mine triggers 5s screen block), Co-Op Grid (giant 50x50 grid with 400 mines and real-time cursor indicators)."
+      },
+      {
+        id: 14,
+        volume: 2,
+        title: "Glacier Slalom",
+        genre: "Endless Downhill Evader / Arcade Racer",
+        inspiration: "SkiFree",
+        visuals: "Glacier slope neon vectors, low-poly pink leaf trees, pixelated Yeti glitch noise monster.",
+        loops: [
+          "Ski down endless slopes dodging rocks, trees, and snowboarders.",
+          "Cross red/blue slalom gate flags to multiply score.",
+          "Perform flips off ramps. Survive long enough for the speed Yeti to chase you."
+        ],
+        controls: "Mouse Move / Left-Right arrow (steer), Space / Up Arrow (jump/flips).",
+        tech: ["Parallax mountain backgrounds", "Seeded pseudo-random maps", "Buffer coordinate posts"],
+        sso: "High-score saves, Achievement: 'yeti_dodger' (survive 15s after Yeti spawn), Achievement: 'slalom_king' (20 consecutive gates cleared).",
+        multiplayer: "Multiplayer Race: Side-by-side racing on seeded seed maps with opponent ghost avatars. Disconnected players are replaced with tracing AI."
+      },
+      {
+        id: 15,
+        volume: 2,
+        title: "Void-Deck Navigator",
+        genre: "Space Trade & Flight Strategy Deck-builder",
+        visuals: "Retro cockpit navigation screen, vector starmaps, CSS 3D trading cards with neon blueprints.",
+        loops: [
+          "Draw resource cards (Fuel, Trade Goods, Tech, Armor).",
+          "Travel planetary lanes, trade commodities, and face random pirate encounters.",
+          "Buy upgrades (shields, cargo bays) to modify the deck and reach the Core Sector."
+        ],
+        controls: "Mouse drag / click (cards and route selection).",
+        tech: ["CSS 3D Transforms", "Card deck shuffling & state machines", "SQLite transaction ledger pricing"],
+        sso: "Deck saves and credits synced to profile, Achievement: 'galactic_monopolist' (accumulate 1M credits).",
+        multiplayer: "Dynamic Market Economy: Commodity prices are shared globally and fluctuate dynamically based on trades of other players."
+      },
+      {
+        id: 16,
+        volume: 2,
+        title: "Neon Nexus",
+        genre: "Color Match / Rhythm Puzzle",
+        visuals: "Pulsating equalizer grids, neon particle bursts, beat-sync sound track visualizers.",
+        loops: [
+          "Falling color blocks land on a grid.",
+          "Align 3 matching blocks to merge and clear.",
+          "Execute shifts/drops in sync with music beat to trigger double scores and combos."
+        ],
+        controls: "Arrows (move), Down/Space (drop), A/D (rotate block colors).",
+        tech: ["Rhythm analyzer scheduler", "Combos multiplier logs", "Canvas particle burst emitter"],
+        sso: "Leaderboards, profile skins, Achievement: 'perfect_rhythm' (50 consecutive beat-synced merges).",
+        multiplayer: "Co-op lobby where players share columns and clear elements on a shared soundtrack."
+      },
+      {
+        id: 17,
+        volume: 2,
+        title: "Aether Sails",
+        genre: "Solar Wind Sailing Simulator / Physics Orbit Voyager",
+        visuals: "Flowing wind particle vector arrays, glowing gravitational arc vectors, deep space gradients.",
+        loops: [
+          "Extend cosmic sails to catch solar wind radiation particles.",
+          "Adjust sail angles relative to particle winds to tack (sail against wind).",
+          "Execute planetary gravitational assists to voyaging systems."
+        ],
+        controls: "Scroll / Up-Down (sails span), Mouse drag / Left-Right (sails angle).",
+        tech: ["Orbit physics solver", "Wind vector math arrays", "Coordinate syncing"],
+        sso: "Saves voyages data, Achievement: 'slingshot_master' (3 gravity assists without burning fuel).",
+        multiplayer: "Crew Co-Op: Pilot controls thrusters and steering; Sail Master manages solar sails and tracks solar winds."
+      },
+      {
+        id: 18,
+        volume: 2,
+        title: "Shadow Crypt",
+        genre: "Turn-based Rogue-lite Tactics",
+        visuals: "Dark dungeon brick floor, dynamic flashlight ray cones, glowing red enemy eyes.",
+        loops: [
+          "Move step-by-step through grid rooms.",
+          "Torch light keeps monsters at bay. Torch fuel decays by 1 point per turn.",
+          "Loot batteries/oil, fight shadow monsters, and search for the floor portal gate."
+        ],
+        controls: "Arrow keys (move/attack), 1/2/3 keys (use torches/flares).",
+        tech: ["Dynamic Raycasting Spotlight", "Turn-based state machine", "Procedural grid generation"],
+        sso: "Daily Seed Run leaderboard (same daily map for all players), Achievement: 'dark_dweller' (clear level with dead torch).",
+        multiplayer: "Leaderboards comparing daily seed completions."
+      },
+      {
+        id: 19,
+        volume: 2,
+        title: "Terminal Core: Hacker Wars",
+        genre: "Terminal Idle Tycoon / Hack Simulator",
+        visuals: "Retro monochrome green terminals, running security logs, network trace nodes.",
+        loops: [
+          "Deploy server mining threads to harvest cycles (CPU/RAM).",
+          "Upgrade server hardware, firewalls, and bypass proxies.",
+          "Launch exploits against corporations to steal core credits."
+        ],
+        controls: "Keyboard terminal commands + Mouse upgrades clicking.",
+        tech: ["Local storage auto-saving loop", "CLI parsing library", "Exploit timer loops"],
+        sso: "SSO rank saves, Achievement: 'mainframe_breached' (hacked T5 corp).",
+        multiplayer: "Hacker Guilds (Nodes): Collaborate with friends to run shared DDoS attacks on massive mainframes. Shared vaults."
+      },
+      {
+        id: 20,
+        volume: 2,
+        title: "Bionic Swarm",
+        genre: "Microbe Programming Battle Simulation",
+        visuals: "Microscopic organic petri-dish fluid, moving cilia nodes, organic cells.",
+        loops: [
+          "Configure cell rules via visual script blocks (swim, split, attack).",
+          "Release customized bacterium strains into the petri-dish.",
+          "Observe cells gather nutrient dots, multiply, and defeat other bacterial strains."
+        ],
+        controls: "Drag-and-drop code blocks script builder.",
+        tech: ["Organic cell physics solver", "Visual block syntax parser", "Run battles server-side"],
+        sso: "Matchmaking queue records wins/ratings, Achievement: 'apex_predator' (strain completely dominates dish).",
+        multiplayer: "Petri Duel: Matchmaking queue pairs designed DNA strings. Battles run server-side and playback log is sent to client."
+      }
+    ];
+
+    // State Variables
+    let activeItem = 4; // Gridlock Neon default
+    let isBlueprintActive = false;
+    let blueprintType = 'sso';
+    let activeMobileTab = 'menu';
+
+    // Shared Audio
+    let audioCtx = null;
+
+    // Gridlock Neon game variables
+    let isGridlockPlaying = false;
+    let gridlockScore = 0;
+    let gridlockShields = 100;
+    let playerLane = 1;
+    let gridOffset = 0;
+    let obstacles = [];
+    let shards = [];
+    let floatyTexts = [];
+    let synthLoopInterval = null;
+    let isAudioBeating = false;
+    let gridPulseIntensity = 0;
+    let currentBeat = 0;
+    let nextBeatTime = 0;
+    const tempo = 125;
+    const beatDuration = 60 / tempo;
+    let lastSpawnTime = 0;
+
+    // Alchemist variables
+    let selectedIngredients = [];
+    const alchRecipes = {
+      'Fire+Earth': { name: 'Lava 🌋', id: 'rec-alch-lava', color: '#ff4d00' },
+      'Earth+Fire': { name: 'Lava 🌋', id: 'rec-alch-lava', color: '#ff4d00' },
+      'Fire+Water': { name: 'Steam 💨', id: 'rec-alch-steam', color: '#e0e0e0' },
+      'Water+Fire': { name: 'Steam 💨', id: 'rec-alch-steam', color: '#e0e0e0' },
+      'Fire+Air': { name: 'Lightning ⚡', id: 'rec-alch-lightning', color: '#ffea00' },
+      'Air+Fire': { name: 'Lightning ⚡', id: 'rec-alch-lightning', color: '#ffea00' },
+      'Water+Earth': { name: 'Mud 🪨', id: 'rec-alch-mud', color: '#7a5a3a' },
+      'Earth+Water': { name: 'Mud 🪨', id: 'rec-alch-mud', color: '#7a5a3a' },
+      'Water+Air': { name: 'Mist 🌫️', id: 'rec-alch-mist', color: '#a0e0e4' },
+      'Air+Water': { name: 'Mist 🌫️', id: 'rec-alch-mist', color: '#a0e0e4' },
+      'Earth+Air': { name: 'Dust 🌪️', id: 'rec-alch-dust', color: '#c2b280' },
+      'Air+Earth': { name: 'Dust 🌪️', id: 'rec-alch-dust', color: '#c2b280' }
+    };
+    let alchBubbles = [];
+    let alchExplosions = [];
+    let cauldronCanvas = null;
+    let cauldronCtx = null;
+
+    // Canvas preview global handles
+    let liveCanvas = null;
+    let liveCtx = null;
+    let animFrameId = null;
+    let canvasResizeListener = null;
+
+    // -------------------------------------------------------------
+    // Menu & Initialization
+    // -------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      liveCanvas = document.getElementById('live-canvas');
+      liveCtx = liveCanvas.getContext('2d');
+      cauldronCanvas = document.getElementById('alch-cauldron-canvas');
+      cauldronCtx = cauldronCanvas.getContext('2d');
+
+      // Adjust canvas resolution
+      resizeCanvas(liveCanvas);
+      resizeCanvas(cauldronCanvas);
+      window.addEventListener('resize', () => {
+        // Only resize if the preview panel is active or not in mobile hidden state
+        if (window.innerWidth > 960 || activeMobileTab === 'preview') {
+          resizeCanvas(liveCanvas);
+          resizeCanvas(cauldronCanvas);
+        }
+      });
+
+      renderMenuList();
+      
+      // Initialize tab container class for mobile
+      const container = document.querySelector('.app-container');
+      if (container) {
+        container.classList.add('active-tab-menu');
+      }
+      
+      selectGame(4, false); // Load Gridlock Neon first, do not auto-switch tab during initialization
+    });
+
+    function resizeCanvas(canvas) {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+
+    function switchMobileTab(tab) {
+      activeMobileTab = tab;
+      
+      const container = document.querySelector('.app-container');
+      if (container) {
+        container.classList.remove('active-tab-menu', 'active-tab-specs', 'active-tab-preview');
+        container.classList.add(`active-tab-${tab}`);
+      }
+
+      document.querySelectorAll('.mobile-tab-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`tab-btn-${tab}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      // Force canvas resize when preview tab is shown
+      if (tab === 'preview') {
+        setTimeout(() => {
+          if (liveCanvas) resizeCanvas(liveCanvas);
+          if (cauldronCanvas) resizeCanvas(cauldronCanvas);
+        }, 50);
+      }
+    }
+
+    function renderMenuList() {
+      const list1 = document.getElementById('volume-1-list');
+      const list2 = document.getElementById('volume-2-list');
+      list1.innerHTML = '';
+      list2.innerHTML = '';
+
+      gamesData.forEach(game => {
+        const li = document.createElement('li');
+        li.className = 'menu-item';
+        li.id = `menu-game-${game.id}`;
+        li.onclick = () => selectGame(game.id);
+        
+        let emoji = '🎮';
+        if (game.id === 3) emoji = '🧪';
+        else if (game.id === 4) emoji = '🏍️';
+        else if (game.id === 1) emoji = '💻';
+        else if (game.id === 2) emoji = '🪐';
+        else if (game.id === 11) emoji = '🚰';
+        else if (game.id === 13) emoji = '💣';
+        else if (game.id === 14) emoji = '⛷️';
+        else if (game.id === 15) emoji = '🚀';
+
+        li.innerHTML = `<span class="game-id-badge">${game.id}</span> ${emoji} ${game.title}`;
+        
+        if (game.volume === 1) {
+          list1.appendChild(li);
+        } else {
+          list2.appendChild(li);
+        }
+      });
+    }
+
+    function filterMenu() {
+      const val = document.getElementById('search-bar').value.toLowerCase();
+      gamesData.forEach(game => {
+        const el = document.getElementById(`menu-game-${game.id}`);
+        if (!el) return;
+        const match = game.title.toLowerCase().includes(val) || 
+                      game.genre.toLowerCase().includes(val) || 
+                      game.tech.some(t => t.toLowerCase().includes(val));
+        el.style.display = match ? 'flex' : 'none';
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Controller Logic
+    // -------------------------------------------------------------
+    function selectGame(id, autoSwitchTab = true) {
+      isBlueprintActive = false;
+      activeItem = id;
+      
+      // Update sidebar styling
+      document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+      const activeMenu = document.getElementById(`menu-game-${id}`);
+      if (activeMenu) activeMenu.classList.add('active');
+
+      // Update UI Panels visibility
+      document.getElementById('details-panel').style.display = 'flex';
+      document.getElementById('game-preview-panel').style.display = 'flex';
+      document.getElementById('blueprint-panel').style.display = 'none';
+
+      // Load Details
+      const game = gamesData.find(g => g.id === id);
+      renderGameDetails(game);
+
+      // Update mobile tab label
+      const mobileTabLabel = document.getElementById('mobile-tab-preview-label');
+      if (mobileTabLabel) mobileTabLabel.innerText = 'Simulator';
+
+      // Auto switch to specs tab on mobile
+      if (autoSwitchTab && window.innerWidth <= 960) {
+        switchMobileTab('specs');
+      }
+
+      // Stop previous previews
+      stopGridlockGame();
+      if (animFrameId) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+      }
+
+      // Canvas Display Layouts
+      if (id === 3) {
+        // Alchemist Cauldron Preview layout
+        document.getElementById('std-canvas-box').style.display = 'none';
+        document.getElementById('cauldron-preview-box').style.display = 'flex';
+        document.getElementById('preview-control-bar').style.display = 'none';
+        document.getElementById('preview-panel-title').innerText = "Crucible Crafting Simulator";
+        initAlchemistEngine();
+      } else if (id === 4) {
+        // Gridlock runner Canvas layout
+        document.getElementById('std-canvas-box').style.display = 'block';
+        document.getElementById('cauldron-preview-box').style.display = 'none';
+        document.getElementById('preview-control-bar').style.display = 'flex';
+        document.getElementById('grid-demo-overlay').style.display = 'flex';
+        document.getElementById('preview-panel-title').innerText = "Gridlock Neon Lane Runner";
+        resetGridlockState();
+        startThemeAbstractVisualizer(4);
+      } else {
+        // Standard abstract visualizer view
+        document.getElementById('std-canvas-box').style.display = 'block';
+        document.getElementById('cauldron-preview-box').style.display = 'none';
+        document.getElementById('preview-control-bar').style.display = 'none';
+        document.getElementById('grid-demo-overlay').style.display = 'none';
+        document.getElementById('preview-panel-title').innerText = `${game.title} Concept Visualization`;
+        startThemeAbstractVisualizer(id);
+      }
+    }
+
+    function switchBlueprint(type) {
+      isBlueprintActive = true;
+      blueprintType = type;
+
+      // Update sidebar highlights
+      document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+      document.getElementById(`menu-blue-${type}`).classList.add('active');
+
+      // Update layout visibility
+      document.getElementById('details-panel').style.display = 'none';
+      document.getElementById('game-preview-panel').style.display = 'none';
+      document.getElementById('blueprint-panel').style.display = 'flex';
+
+      // Update mobile tab label
+      const mobileTabLabel = document.getElementById('mobile-tab-preview-label');
+      if (mobileTabLabel) mobileTabLabel.innerText = 'Blueprint';
+
+      // Auto switch to preview tab on mobile (since blueprints have no specs panel)
+      if (window.innerWidth <= 960) {
+        switchMobileTab('preview');
+      }
+
+      // Update blueprints columns
+      document.getElementById('bp-sso-diag').style.display = type === 'sso' ? 'flex' : 'none';
+      document.getElementById('bp-sync-diag').style.display = type === 'sync' ? 'flex' : 'none';
+
+      // Stop active rendering loops
+      stopGridlockGame();
+      if (animFrameId) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+      }
+    }
+
+    function renderGameDetails(game) {
+      const panel = document.getElementById('details-panel');
+      
+      let ssoSection = '';
+      if (game.sso) {
+        ssoSection = `
+          <div class="section-card">
+            <h3>SSO Integration & Achievements</h3>
+            <p>${game.sso}</p>
+          </div>
+        `;
+      }
+
+      let muliplayerSection = '';
+      if (game.multiplayer) {
+        muliplayerSection = `
+          <div class="section-card">
+            <h3>Multiplayer Architecture</h3>
+            <p>${game.multiplayer}</p>
+          </div>
+        `;
+      }
+
+      let inspirationHeader = '';
+      if (game.inspiration) {
+        inspirationHeader = `<span class="pitch-badge">Classic Inspiration: ${game.inspiration}</span>`;
+      }
+
+      const loopsHtml = game.loops.map((l, i) => `
+        <li>
+          <div class="loop-number">${i+1}</div>
+          <div class="loop-text">${l}</div>
+        </li>
+      `).join('');
+
+      const tagsHtml = game.tech.map(t => `<span class="tech-tag">${t}</span>`).join('');
+
+      panel.innerHTML = `
+        <div class="pitch-header">
+          <div class="pitch-header-meta">
+            <span class="pitch-badge">Game ID #${game.id}</span>
+            <span class="pitch-badge">Volume ${game.volume}</span>
+            ${inspirationHeader}
+          </div>
+          <h1 class="pitch-title">${game.title}</h1>
+          <div class="pitch-genre">${game.genre}</div>
+        </div>
+
+        <div class="section-card">
+          <h3>Visual Design & Aesthetics</h3>
+          <p>${game.visuals}</p>
+        </div>
+
+        <div class="section-card">
+          <h3>Core Loops</h3>
+          <ul class="loop-list">
+            ${loopsHtml}
+          </ul>
+        </div>
+
+        <div class="section-card">
+          <h3>User Interface & Controls</h3>
+          <p>${game.controls}</p>
+        </div>
+
+        ${ssoSection}
+        ${muliplayerSection}
+
+        <div class="section-card">
+          <h3>Technical Stack</h3>
+          <div class="tech-tags">
+            ${tagsHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    /* -------------------------------------------------------------
+       ALCHEMIST'S CRUCIBLE LOGIC
+       ------------------------------------------------------------- */
+    function initAlchemistEngine() {
+      selectedIngredients = [];
+      alchBubbles = [];
+      alchExplosions = [];
+      updateAlchemistUI();
+      
+      function renderAlchemistFrame() {
+        if (activeItem !== 3 || isBlueprintActive) return;
+        
+        // Spawn bubbles
+        if (Math.random() < 0.25) {
+          alchBubbles.push({
+            x: cauldronCanvas.width / 2 + (Math.random() * 80 - 40),
+            y: cauldronCanvas.height,
+            vy: -Math.random() * 1.5 - 0.4,
+            size: Math.random() * 4 + 2,
+            life: 50 + Math.random() * 30,
+            alpha: 0.8
+          });
+        }
+
+        // Update bubbles
+        alchBubbles.forEach((p, idx) => {
+          p.y += p.vy;
+          p.life--;
+          p.alpha = p.life / 80;
+          if (p.life <= 0 || p.y < 40) {
+            alchBubbles.splice(idx, 1);
+          }
+        });
+
+        // Update explosions
+        alchExplosions.forEach((p, idx) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.06; // Gravity
+          p.alpha -= p.decay;
+          if (p.alpha <= 0) {
+            alchExplosions.splice(idx, 1);
+          }
+        });
+
+        // Clear and render cauldron canvas
+        cauldronCtx.clearRect(0, 0, cauldronCanvas.width, cauldronCanvas.height);
+        
+        // Draw bubbles
+        cauldronCtx.fillStyle = '#52b788';
+        alchBubbles.forEach(p => {
+          cauldronCtx.globalAlpha = p.alpha;
+          cauldronCtx.beginPath();
+          cauldronCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          cauldronCtx.fill();
+        });
+
+        // Draw explosion particles
+        alchExplosions.forEach(p => {
+          cauldronCtx.fillStyle = p.color;
+          cauldronCtx.globalAlpha = p.alpha;
+          cauldronCtx.beginPath();
+          cauldronCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          cauldronCtx.fill();
+        });
+
+        cauldronCtx.globalAlpha = 1.0;
+
+        requestAnimationFrame(renderAlchemistFrame);
+      }
+
+      requestAnimationFrame(renderAlchemistFrame);
+    }
+
+    function triggerAddAlchemist(name, emoji) {
+      initAudioContext();
+      if (selectedIngredients.length >= 2) return;
+
+      selectedIngredients.push({ name, emoji });
+      playTone(330 + selectedIngredients.length * 110, 'triangle', 0.15, 0.1);
+      
+      // Floating particles
+      const cW = cauldronCanvas.width;
+      const cH = cauldronCanvas.height;
+      for (let i = 0; i < 15; i++) {
+        alchExplosions.push({
+          x: cW / 2 + (Math.random() * 40 - 20),
+          y: cH / 2 + (Math.random() * 20 - 10),
+          vx: Math.random() * 3 - 1.5,
+          vy: Math.random() * -3 - 0.5,
+          size: Math.random() * 3 + 1.5,
+          color: name === 'Fire' ? '#ef4444' : name === 'Water' ? '#3b82f6' : name === 'Earth' ? '#10b981' : '#06b6d4',
+          alpha: 1.0,
+          decay: 0.02
+        });
+      }
+
+      updateAlchemistUI();
+
+      if (selectedIngredients.length === 2) {
+        document.getElementById('alch-log-text').innerText = "Transmuting compounds...";
+        setTimeout(synthesizeAlchemist, 800);
+      }
+    }
+
+    function updateAlchemistUI() {
+      const s1 = document.getElementById('slot-c1');
+      const s2 = document.getElementById('slot-c2');
+
+      if (selectedIngredients[0]) {
+        s1.innerText = selectedIngredients[0].emoji;
+        s1.classList.add('filled');
+      } else {
+        s1.innerText = 'Empty';
+        s1.classList.remove('filled');
+      }
+
+      if (selectedIngredients[1]) {
+        s2.innerText = selectedIngredients[1].emoji;
+        s2.classList.add('filled');
+      } else {
+        s2.innerText = 'Empty';
+        s2.classList.remove('filled');
+      }
+    }
+
+    function synthesizeAlchemist() {
+      const e1 = selectedIngredients[0].name;
+      const e2 = selectedIngredients[1].name;
+      const key = `${e1}+${e2}`;
+
+      const res = alchRecipes[key];
+      const log = document.getElementById('alch-log-text');
+      
+      const cW = cauldronCanvas.width;
+      const cH = cauldronCanvas.height;
+
+      if (res) {
+        log.innerHTML = `Created <strong>${res.name}</strong>! Formula recorded.`;
+        playAlchemistMagicalChime();
+        
+        // Mark unlocked in DOM
+        const row = document.getElementById(res.id);
+        if (row) row.classList.add('unlocked');
+
+        // Synthesis explosion particles
+        for (let i = 0; i < 50; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 4 + 1.5;
+          alchExplosions.push({
+            x: cW / 2,
+            y: cH / 2 + 10,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 1.0,
+            size: Math.random() * 4 + 2,
+            color: res.color,
+            alpha: 1.0,
+            decay: Math.random() * 0.015 + 0.01
+          });
+        }
+      } else {
+        log.innerHTML = `<span style="color:#f87171;">Fizzled!</span> Materials vaporized.`;
+        playTone(120, 'sawtooth', 0.3, 0.15);
+        for (let i = 0; i < 30; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 2 + 1;
+          alchExplosions.push({
+            x: cW / 2,
+            y: cH / 2 + 10,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 0.5,
+            size: Math.random() * 3 + 1.5,
+            color: '#6b7280',
+            alpha: 0.8,
+            decay: 0.02
+          });
+        }
+      }
+
+      setTimeout(() => {
+        selectedIngredients = [];
+        updateAlchemistUI();
+        if (log.innerHTML.includes('Fizzled') || log.innerHTML.includes('Created')) {
+          log.innerText = "Crucible warm. Add elements.";
+        }
+      }, 1500);
+    }
+
+    function triggerResetAlchemist() {
+      selectedIngredients = [];
+      updateAlchemistUI();
+      document.getElementById('alch-log-text').innerText = "Cauldron reset.";
+      playTone(180, 'triangle', 0.1, 0.05);
+    }
+
+    function playAlchemistMagicalChime() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((f, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f, now + i * 0.07);
+        gain.gain.setValueAtTime(0.08, now + i * 0.07);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now + i * 0.07);
+        osc.stop(now + i * 0.07 + 0.3);
+      });
+    }
+
+    /* -------------------------------------------------------------
+       GRIDLOCK NEON SIMULATOR LOGIC
+       ------------------------------------------------------------- */
+    function resetGridlockState() {
+      gridlockScore = 0;
+      gridlockShields = 100;
+      obstacles = [];
+      shards = [];
+      floatyTexts = [];
+      document.getElementById('stat-val-1').innerText = gridlockScore;
+      document.getElementById('stat-val-2').innerText = '100%';
+    }
+
+    function triggerToggleGridlockAudio() {
+      initAudioContext();
+      const btn = document.getElementById('rhythm-audio-toggle');
+      if (isAudioBeating) {
+        isAudioBeating = false;
+        btn.innerText = '🔈 Enable Audio';
+        if (synthLoopInterval) {
+          clearInterval(synthLoopInterval);
+          synthLoopInterval = null;
+        }
+      } else {
+        isAudioBeating = true;
+        btn.innerText = '🔊 Synth Playing';
+        nextBeatTime = audioCtx.currentTime;
+        currentBeat = 0;
+        synthLoopInterval = setInterval(() => {
+          if (!isGridlockPlaying) return;
+          while (nextBeatTime < audioCtx.currentTime + 0.1) {
+            playRhythmBass(currentBeat, nextBeatTime);
+            nextBeatTime += beatDuration;
+            currentBeat = (currentBeat + 1) % 8;
+          }
+        }, 30);
+      }
+    }
+
+    function playRhythmBass(beat, time) {
+      if (!audioCtx) return;
+      const freqs = [65.40, 65.40, 77.78, 65.40, 87.31, 87.31, 58.27, 58.27];
+      const freq = freqs[beat];
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, time);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(80, time);
+      filter.frequency.exponentialRampToValueAtTime(600, time + 0.05);
+      filter.frequency.exponentialRampToValueAtTime(120, time + 0.15);
+      filter.Q.setValueAtTime(8, time);
+
+      gain.gain.setValueAtTime(0.2, time);
+      gain.gain.exponentialRampToValueAtTime(0.005, time + beatDuration - 0.02);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(time);
+      osc.stop(time + beatDuration - 0.01);
+
+      setTimeout(() => {
+        gridPulseIntensity = 1.0;
+        if (isGridlockPlaying) {
+          if (beat === 0 || beat === 4) obstacles.push({ lane: Math.floor(Math.random()*3), progress: 0, speed: 0.015 });
+          else if (beat === 2 || beat === 6) shards.push({ lane: Math.floor(Math.random()*3), progress: 0, speed: 0.018 });
+        }
+      }, (time - audioCtx.currentTime) * 1000);
+    }
+
+    function playTone(freq, type, duration, vol) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playWhiteNoiseCrash() {
+      if (!audioCtx) return;
+      try {
+        const bufferSize = audioCtx.sampleRate * 0.2;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(200, audioCtx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.25);
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        noise.start();
+        noise.stop(audioCtx.currentTime + 0.2);
+      } catch(e) {
+        playTone(150, 'triangle', 0.2, 0.2);
+      }
+    }
+
+    function triggerStartGridlock() {
+      initAudioContext();
+      resetGridlockState();
+      document.getElementById('grid-demo-overlay').style.display = 'none';
+      isGridlockPlaying = true;
+      lastSpawnTime = Date.now();
+      window.addEventListener('keydown', handleGridlockKeys);
+    }
+
+    function stopGridlockGame() {
+      isGridlockPlaying = false;
+      window.removeEventListener('keydown', handleGridlockKeys);
+      if (synthLoopInterval) {
+        clearInterval(synthLoopInterval);
+        synthLoopInterval = null;
+      }
+      isAudioBeating = false;
+      const btn = document.getElementById('rhythm-audio-toggle');
+      if (btn) btn.innerText = '🔈 Enable Audio';
+    }
+
+    function handleGridlockKeys(e) {
+      if (!isGridlockPlaying) return;
+      if (['ArrowLeft', 'ArrowRight', 'a', 'd', 'A', 'D'].includes(e.key)) {
+        e.preventDefault();
+      }
+      if ((e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') && playerLane > 0) {
+        playerLane--;
+        playTone(400, 'sine', 0.05, 0.05);
+      }
+      if ((e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') && playerLane < 2) {
+        playerLane++;
+        playTone(400, 'sine', 0.05, 0.05);
+      }
+    }
+
+    function updateGridlockFrame() {
+      gridOffset = (gridOffset + 0.02) % 1.0;
+      gridPulseIntensity *= 0.92;
+
+      // Default spawn when music beats are disabled
+      if (!isAudioBeating) {
+        const now = Date.now();
+        if (now - lastSpawnTime > 1500) {
+          if (Math.random() > 0.5) obstacles.push({ lane: Math.floor(Math.random()*3), progress: 0, speed: 0.015 });
+          else shards.push({ lane: Math.floor(Math.random()*3), progress: 0, speed: 0.018 });
+          lastSpawnTime = now;
+        }
+      }
+
+      // Obstacles update
+      obstacles.forEach((obs, idx) => {
+        obs.progress += obs.speed;
+        if (obs.progress >= 0.85 && obs.progress <= 0.95 && obs.lane === playerLane) {
+          gridlockShields -= 20;
+          playWhiteNoiseCrash();
+          spawnFloatyText('SHIELD COLLISION -20%', '#ef4444');
+          obstacles.splice(idx, 1);
+          if (gridlockShields <= 0) {
+            triggerGridlockGameOver();
+          }
+        } else if (obs.progress > 1.0) {
+          obstacles.splice(idx, 1);
+        }
+      });
+
+      // Shards update
+      shards.forEach((sh, idx) => {
+        sh.progress += sh.speed;
+        if (sh.progress >= 0.85 && sh.progress <= 0.95 && sh.lane === playerLane) {
+          gridlockScore += 100;
+          playTone(880, 'sine', 0.08, 0.1);
+          spawnFloatyText('+100 Shard', '#00f0ff');
+          shards.splice(idx, 1);
+        } else if (sh.progress > 1.0) {
+          shards.splice(idx, 1);
+        }
+      });
+
+      // Update HUD
+      document.getElementById('stat-val-1').innerText = gridlockScore;
+      document.getElementById('stat-val-2').innerText = gridlockShields + '%';
+    }
+
+    function triggerGridlockGameOver() {
+      isGridlockPlaying = false;
+      playTone(180, 'sawtooth', 0.5, 0.2);
+      window.removeEventListener('keydown', handleGridlockKeys);
+      
+      const overlay = document.getElementById('grid-demo-overlay');
+      overlay.style.display = 'flex';
+      overlay.innerHTML = `
+        <h3 style="color:#ff007f;font-family:'Orbitron';font-size:1.5rem;text-shadow:0 0 10px rgba(255,0,127,0.7);margin-bottom:0.25rem;">DE-SYNC</h3>
+        <p style="color:#fff;margin-bottom:1rem;font-size:0.85rem;">Final score: ${gridlockScore}</p>
+        <button class="demo-start-btn" onclick="triggerStartGridlock()">Reboot</button>
+      `;
+    }
+
+    function spawnFloatyText(text, color) {
+      const box = document.getElementById('std-canvas-box');
+      const div = document.createElement('div');
+      div.className = 'c-floaty';
+      div.innerText = text;
+      div.style.color = color;
+      div.style.left = '50%';
+      div.style.top = '40%';
+      div.style.transform = 'translate(-50%, -50%)';
+      box.appendChild(div);
+      setTimeout(() => div.remove(), 800);
+    }
+
+    /* -------------------------------------------------------------
+       THEME & ABSTRACT VISUALIZERS (CANVAS RENDERING ENGINE)
+       ------------------------------------------------------------- */
+    function startThemeAbstractVisualizer(gameId) {
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      
+      let tick = 0;
+      // Setup dynamic variables
+      let stars = [];
+      for(let i=0; i<40; i++) stars.push({x: Math.random()*400, y: Math.random()*320, r: Math.random()*2+0.5, speed: Math.random()*1+0.5});
+
+      let orbitAngle = 0;
+      let circuitPulse = 0;
+      let equalizers = Array(12).fill(0).map(() => Math.random()*80 + 10);
+      let cells = [];
+      for(let i=0; i<8; i++) {
+        cells.push({
+          x: Math.random()*280+60,
+          y: Math.random()*200+60,
+          vx: Math.random()*1.6-0.8,
+          vy: Math.random()*1.6-0.8,
+          r: Math.random()*15+10,
+          color: `hsla(${120 + Math.random()*40}, 65%, 45%, 0.6)`
+        });
+      }
+
+      function renderFrame() {
+        if (activeItem !== gameId || isBlueprintActive) return;
+        
+        tick++;
+        const w = liveCanvas.width = liveCanvas.getBoundingClientRect().width;
+        const h = liveCanvas.height = liveCanvas.getBoundingClientRect().height;
+
+        // Visualizer Routing
+        if (gameId === 4) {
+          // Live playable Gridlock simulation loop
+          if (isGridlockPlaying) {
+            updateGridlockFrame();
+          }
+          drawGridlockVisualizer(liveCtx, w, h, tick);
+        } else {
+          // Abstract theme rendering
+          liveCtx.fillStyle = '#020205';
+          liveCtx.fillRect(0, 0, w, h);
+
+          switch(gameId) {
+            case 1: // Cyberpunk Hacking
+              drawCyberpunk(liveCtx, w, h, tick);
+              break;
+            case 2: // Orbit Weaver
+              drawOrbitWeaver(liveCtx, w, h, tick);
+              break;
+            case 5: // Stealth
+              drawStealth(liveCtx, w, h, tick);
+              break;
+            case 6: // Eco Dome
+              drawEcoDome(liveCtx, w, h, tick);
+              break;
+            case 7: // Tycoon
+              drawTycoon(liveCtx, w, h, tick);
+              break;
+            case 8: // Dungeon
+              drawDungeon(liveCtx, w, h, tick);
+              break;
+            case 9: // Stellar Colony
+              drawColony(liveCtx, w, h, tick);
+              break;
+            case 10: // Chroma Shift
+              drawChromaShift(liveCtx, w, h, tick);
+              break;
+            case 11: // Pipe Fever
+              drawPipeFever(liveCtx, w, h, tick);
+              break;
+            case 12: // Microchip Journey
+              drawMicrochip(liveCtx, w, h, tick);
+              break;
+            case 13: // RetroSweeper
+              drawRetroSweeper(liveCtx, w, h, tick);
+              break;
+            case 14: // Glacier Slalom
+              drawSlalom(liveCtx, w, h, tick);
+              break;
+            case 15: // Void Navigator
+              drawVoidNavigator(liveCtx, w, h, stars);
+              break;
+            case 16: // Neon Nexus
+              drawNeonNexus(liveCtx, w, h, equalizers, tick);
+              break;
+            case 17: // Aether Sails
+              drawAetherSails(liveCtx, w, h, tick);
+              break;
+            case 18: // Shadow Crypt
+              drawShadowCrypt(liveCtx, w, h, tick);
+              break;
+            case 19: // Terminal Core
+              drawTerminalCore(liveCtx, w, h, tick);
+              break;
+            case 20: // Bionic Swarm
+              drawBionicSwarm(liveCtx, w, h, cells);
+              break;
+          }
+        }
+
+        animFrameId = requestAnimationFrame(renderFrame);
+      }
+
+      requestAnimationFrame(renderFrame);
+    }
+
+    // --- RENDER ROUTINES ---
+
+    function drawGridlockVisualizer(ctx, w, h, tick) {
+      ctx.fillStyle = '#020207';
+      ctx.fillRect(0, 0, w, h);
+
+      const vpX = w / 2;
+      const vpY = 50;
+
+      // Horizon glow
+      const grad = ctx.createLinearGradient(0, 0, 0, vpY);
+      grad.addColorStop(0, '#000');
+      grad.addColorStop(1, '#2c043e');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, vpY);
+
+      // Horizon line
+      ctx.beginPath();
+      ctx.moveTo(0, vpY);
+      ctx.lineTo(w, vpY);
+      ctx.strokeStyle = `rgba(255, 0, 127, ${0.4 + gridPulseIntensity*0.4})`;
+      ctx.lineWidth = 2 + gridPulseIntensity*3;
+      ctx.stroke();
+
+      // Perspective lines
+      const laneDestX = [20, w*0.35, w*0.65, w-20];
+      laneDestX.forEach(endX => {
+        ctx.beginPath();
+        ctx.moveTo(vpX, vpY);
+        ctx.lineTo(endX, h);
+        ctx.strokeStyle = `rgba(0, 240, 255, ${0.2 + gridPulseIntensity*0.3})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+
+      // Horizontal grid lines
+      const lines = 10;
+      for (let i = 0; i < lines; i++) {
+        const p = ((i + gridOffset) / lines);
+        const lineY = vpY + Math.pow(p, 2.2) * (h - vpY);
+        ctx.beginPath();
+        ctx.moveTo(0, lineY);
+        ctx.lineTo(w, lineY);
+        ctx.strokeStyle = `rgba(255, 0, 127, ${0.1 + p*0.2})`;
+        ctx.lineWidth = 0.5 + p*1.5;
+        ctx.stroke();
+      }
+
+      // Draw active shards
+      shards.forEach(sh => {
+        const py = vpY + Math.pow(sh.progress, 2.2) * (h - vpY);
+        const lX = w * (0.15 + sh.lane * 0.35);
+        const px = vpX + Math.pow(sh.progress, 2.2) * (lX - vpX);
+        const sz = sh.progress * 15 + 2;
+
+        ctx.fillStyle = '#00f0ff';
+        ctx.beginPath();
+        ctx.moveTo(px, py - sz);
+        ctx.lineTo(px + sz*0.7, py);
+        ctx.lineTo(px, py + sz);
+        ctx.lineTo(px - sz*0.7, py);
+        ctx.closePath();
+        ctx.fill();
+      });
+
+      // Draw obstacles
+      obstacles.forEach(obs => {
+        const py = vpY + Math.pow(obs.progress, 2.2) * (h - vpY);
+        const lX = w * (0.15 + obs.lane * 0.35);
+        const px = vpX + Math.pow(obs.progress, 2.2) * (lX - vpX);
+        const szW = obs.progress * 45 + 3;
+        const szH = obs.progress * 20 + 2;
+
+        ctx.fillStyle = '#ff007f';
+        ctx.fillRect(px - szW/2, py - szH, szW, szH);
+      });
+
+      // Draw Player lightcycle
+      const pY = vpY + 0.88 * (h - vpY);
+      const targetLX = w * (0.15 + playerLane * 0.35);
+      const pX = vpX + 0.88 * (targetLX - vpX);
+      
+      ctx.fillStyle = '#00f0ff';
+      ctx.beginPath();
+      ctx.moveTo(pX, pY - 14);
+      ctx.lineTo(pX + 8, pY + 8);
+      ctx.lineTo(pX - 8, pY + 8);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawCyberpunk(ctx, w, h, tick) {
+      ctx.fillStyle = '#0a0a0f';
+      ctx.fillRect(0, 0, w, h);
+      
+      ctx.font = '11px "Fira Code", monospace';
+      ctx.fillStyle = 'rgba(34, 197, 94, 0.85)';
+      
+      const lines = [
+        "SYS LOADED. PORT CONFIG...",
+        "DECRYPTING AUTH TOKEN... SUCCESS",
+        "CONNECTING TO kbs-auth-sso (10.0.4.1)...",
+        "FIREWALL BYPASS ENGINE ACTIVE",
+        "[OK] SYSTEM INTRUSION DETECT SYSTEM NULLIFIED",
+        "DUMPING LOCAL CORE FILES:",
+        "ADDR: 0x8FAC90A -> ROOT ACCESS OK"
+      ];
+      
+      lines.forEach((l, idx) => {
+        const chars = Math.min(l.length, Math.floor(tick / 2) - idx * 10);
+        if (chars > 0) {
+          ctx.fillText(l.substring(0, chars), 20, 40 + idx * 22);
+        }
+      });
+      
+      // Rotating bypass gateway ring
+      ctx.strokeStyle = '#a855f7';
+      ctx.beginPath();
+      ctx.arc(w - 70, h - 70, 35, 0, Math.PI*2);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.strokeStyle = '#00f0ff';
+      ctx.beginPath();
+      ctx.arc(w - 70, h - 70, 25, tick * 0.02, tick * 0.02 + Math.PI*1.2);
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function drawOrbitWeaver(ctx, w, h, tick) {
+      // Background star grid lines
+      ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+      ctx.lineWidth = 1;
+      for(let x=0; x<w; x+=30) {
+        ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+      }
+      for(let y=0; y<h; y+=30) {
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+      }
+
+      const pX = w / 2;
+      const pY = h / 2;
+
+      // Heavy Sun
+      ctx.fillStyle = '#eab308';
+      ctx.beginPath();
+      ctx.arc(pX, pY, 20, 0, Math.PI*2);
+      ctx.shadowColor = '#eab308';
+      ctx.shadowBlur = 15;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Gravity Rings
+      ctx.strokeStyle = 'rgba(234, 179, 8, 0.15)';
+      ctx.beginPath(); ctx.arc(pX, pY, 60, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(pX, pY, 110, 0, Math.PI*2); ctx.stroke();
+
+      // Launching Probe orbit
+      const ang = tick * 0.012;
+      const prX = pX + Math.cos(ang) * 110;
+      const prY = pY + Math.sin(ang) * 110;
+
+      ctx.fillStyle = '#00f0ff';
+      ctx.beginPath();
+      ctx.arc(prX, prY, 5, 0, Math.PI*2);
+      ctx.fill();
+
+      // Trajectory vector line
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+      ctx.beginPath();
+      ctx.moveTo(prX, prY);
+      ctx.lineTo(prX - Math.sin(ang)*30, prY + Math.cos(ang)*30);
+      ctx.stroke();
+    }
+
+    function drawStealth(ctx, w, h, tick) {
+      // Blueprint grid background
+      ctx.strokeStyle = '#083344';
+      for(let x=0; x<w; x+=25) {
+        ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+      }
+      for(let y=0; y<h; y+=25) {
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+      }
+
+      // Vision sweep
+      const gX = w * 0.7;
+      const gY = h * 0.4;
+      const sweepAngle = Math.sin(tick * 0.02) * 0.6 + Math.PI;
+
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+      ctx.beginPath();
+      ctx.moveTo(gX, gY);
+      ctx.arc(gX, gY, 120, sweepAngle - 0.4, sweepAngle + 0.4);
+      ctx.closePath();
+      ctx.fill();
+
+      // Guards
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath(); ctx.arc(gX, gY, 6, 0, Math.PI*2); ctx.fill();
+
+      // Player
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath(); ctx.arc(w*0.3, h*0.6, 6, 0, Math.PI*2); ctx.fill();
+    }
+
+    function drawEcoDome(ctx, w, h, tick) {
+      // Draw hexagons
+      const cX = w / 2;
+      const cY = h / 2 + 20;
+
+      ctx.strokeStyle = '#10b981';
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.1)';
+      
+      // Draw simple rotating hex grid
+      ctx.beginPath();
+      for(let i=0; i<6; i++) {
+        const a = i * Math.PI / 3 + tick*0.002;
+        const x = cX + Math.cos(a)*80;
+        const y = cY + Math.sin(a)*45;
+        if(i===0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Simple pixel tree stalks
+      ctx.fillStyle = '#854d0e';
+      ctx.fillRect(cX-3, cY-25, 6, 15);
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath();
+      ctx.arc(cX, cY-30, 12, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    function drawTycoon(ctx, w, h, tick) {
+      // Draw simple cabinet outline
+      const cabX = w/2 - 35;
+      const cabY = h/2 - 60;
+      ctx.strokeStyle = '#d946ef';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(cabX, cabY, 70, 110);
+
+      // Loading progress bar
+      const progress = (tick % 120) / 120;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.fillRect(cabX+10, cabY+90, 50, 8);
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillRect(cabX+10, cabY+90, 50*progress, 8);
+
+      // Flashing coin sprite popping out
+      if(progress > 0.9) {
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath();
+        ctx.arc(w/2, cabY - 15, 8, 0, Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 10px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('$', w/2, cabY - 12);
+      }
+    }
+
+    function drawDungeon(ctx, w, h, tick) {
+      const cX = w / 2;
+      const cY = h / 2;
+      ctx.strokeStyle = '#f43f5e';
+      ctx.lineWidth = 1;
+
+      // Isometric wireframe cube rotating
+      const side = 60;
+      const rot = tick * 0.01;
+      
+      const nodes = [
+        {x: -1, y: -1, z: -1}, {x: 1, y: -1, z: -1}, {x: 1, y: 1, z: -1}, {x: -1, y: 1, z: -1},
+        {x: -1, y: -1, z: 1}, {x: 1, y: -1, z: 1}, {x: 1, y: 1, z: 1}, {x: -1, y: 1, z: 1}
+      ];
+
+      const proj = nodes.map(n => {
+        // Rotate
+        const x1 = n.x * Math.cos(rot) - n.y * Math.sin(rot);
+        const y1 = n.x * Math.sin(rot) + n.y * Math.cos(rot);
+        const z1 = n.z;
+        // Project
+        return {
+          x: cX + (x1 - y1) * side * 0.8,
+          y: cY + (x1 + y1) * side * 0.4 - z1 * side * 0.5
+        };
+      });
+
+      // Draw Edges
+      const connections = [
+        [0,1], [1,2], [2,3], [3,0],
+        [4,5], [5,6], [6,7], [7,4],
+        [0,4], [1,5], [2,6], [3,7]
+      ];
+
+      connections.forEach(pair => {
+        ctx.beginPath();
+        ctx.moveTo(proj[pair[0]].x, proj[pair[0]].y);
+        ctx.lineTo(proj[pair[1]].x, proj[pair[1]].y);
+        ctx.stroke();
+      });
+    }
+
+    function drawColony(ctx, w, h, tick) {
+      // Ship layout outline
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(w/2 - 120, h/2 - 60, 240, 120);
+      ctx.beginPath();
+      ctx.moveTo(w/2 - 40, h/2 - 60); ctx.lineTo(w/2 - 40, h/2 + 60);
+      ctx.moveTo(w/2 + 40, h/2 - 60); ctx.lineTo(w/2 + 40, h/2 + 60);
+      ctx.stroke();
+
+      // Progress metrics
+      ctx.fillStyle = '#22c55e'; // Oxygen
+      ctx.fillRect(w/2 - 100, h/2 - 40, 40, 10);
+
+      const warning = (tick % 40) < 20;
+      ctx.fillStyle = warning ? '#ef4444' : 'rgba(239,68,68,0.2)'; // Alarm
+      ctx.beginPath();
+      ctx.arc(w/2, h/2, 10, 0, Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle = '#fff';
+      ctx.font = '9px Orbitron';
+      ctx.textAlign = 'center';
+      ctx.fillText(warning ? "HULL LEAK WARNING" : "MONITOR OK", w/2, h/2 + 40);
+    }
+
+    function drawChromaShift(ctx, w, h, tick) {
+      // Platform colors
+      const colors = ['#ef4444', '#3b82f6', '#eab308'];
+      
+      // Platform bars
+      ctx.fillStyle = colors[0]; ctx.fillRect(w*0.1, h*0.7, 70, 8);
+      ctx.fillStyle = colors[1]; ctx.fillRect(w*0.4, h*0.5, 70, 8);
+      ctx.fillStyle = colors[2]; ctx.fillRect(w*0.7, h*0.6, 70, 8);
+
+      // Player box bouncing
+      const pIndex = Math.floor(tick / 50) % 3;
+      const bProgress = (tick % 50) / 50;
+      
+      let py = h*0.7 - 20;
+      let px = w*0.2;
+      if(pIndex === 1) { px = w*0.5; py = h*0.5 - 20; }
+      else if(pIndex === 2) { px = w*0.8; py = h*0.6 - 20; }
+
+      // Jump parabola
+      const jumpY = Math.sin(bProgress * Math.PI) * 45;
+      
+      ctx.fillStyle = colors[(pIndex + (bProgress > 0.5 ? 1 : 0)) % 3];
+      ctx.fillRect(px, py - jumpY, 16, 16);
+    }
+
+    function drawPipeFever(ctx, w, h, tick) {
+      ctx.strokeStyle = '#d4a373';
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+
+      // Pipe paths
+      ctx.beginPath();
+      ctx.moveTo(w*0.2, h/2);
+      ctx.lineTo(w*0.4, h/2);
+      ctx.lineTo(w*0.4, h*0.3);
+      ctx.lineTo(w*0.65, h*0.3);
+      ctx.lineTo(w*0.65, h*0.7);
+      ctx.lineTo(w*0.8, h*0.7);
+      ctx.stroke();
+
+      // Fluid filling animation
+      const fillLen = (tick % 180) / 180;
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([250*fillLen, 500]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function drawMicrochip(ctx, w, h, tick) {
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.15)';
+      ctx.lineWidth = 1;
+      
+      // Grid buses
+      for(let x=50; x<w; x+=100) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+
+      // Central processor square
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(w/2 - 40, h/2 - 40, 80, 80);
+
+      // Tracers
+      const tracerPos = (tick % 100) / 100;
+      ctx.fillStyle = '#00f0ff';
+      ctx.beginPath();
+      ctx.arc(w/2 - 40 + 80 * tracerPos, h/2 - 40, 4, 0, Math.PI*2);
+      ctx.arc(w/2 + 40, h/2 - 40 + 80 * tracerPos, 4, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    function drawRetroSweeper(ctx, w, h, tick) {
+      // Draw grid squares
+      const sz = 24;
+      const gW = 8;
+      const gH = 6;
+      const startX = w/2 - (gW*sz)/2;
+      const startY = h/2 - (gH*sz)/2;
+
+      ctx.strokeStyle = '#1e293b';
+      ctx.fillStyle = '#0f172a';
+      
+      for(let x=0; x<gW; x++) {
+        for(let y=0; y<gH; y++) {
+          const px = startX + x*sz;
+          const py = startY + y*sz;
+          ctx.fillRect(px, py, sz-2, sz-2);
+          ctx.strokeRect(px, py, sz-2, sz-2);
+        }
+      }
+
+      // Revealed cells
+      ctx.fillStyle = '#ef4444'; // Flag
+      ctx.fillRect(startX + 2*sz + 4, startY + 2*sz + 4, sz-10, sz-10);
+
+      ctx.fillStyle = '#3b82f6';
+      ctx.font = 'bold 11px Orbitron';
+      ctx.textAlign = 'center';
+      ctx.fillText('1', startX + 1.5*sz, startY + 2.6*sz);
+      ctx.fillText('2', startX + 3.5*sz, startY + 3.6*sz);
+
+      // Scanline sweep
+      const scanY = (tick * 1.5) % h;
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.08)';
+      ctx.fillRect(0, scanY - 4, w, 8);
+    }
+
+    function drawSlalom(ctx, w, h, tick) {
+      ctx.fillStyle = '#030712';
+      ctx.fillRect(0, 0, w, h);
+
+      // Mountains scrolling parallax
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.lineWidth = 1;
+      
+      // Slalom lines
+      const slopeSpeed = (tick * 2) % 60;
+      ctx.strokeStyle = '#475569';
+      for(let i=-2; i<8; i++) {
+        const lineY = i*60 + slopeSpeed;
+        ctx.beginPath();
+        ctx.moveTo(w*0.3 - (lineY*0.1), lineY);
+        ctx.lineTo(w*0.7 + (lineY*0.1), lineY);
+        ctx.stroke();
+      }
+
+      // Flags
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(w*0.35, h/2, 8, 8);
+      ctx.fillStyle = '#3b82f6';
+      ctx.fillRect(w*0.6, h/2 - 40, 8, 8);
+
+      // Player dot skier
+      ctx.fillStyle = '#ec4899';
+      ctx.beginPath();
+      ctx.arc(w/2 + Math.sin(tick*0.04)*35, h*0.8, 5, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    function drawVoidNavigator(ctx, w, h, stars) {
+      // Space travel star warp
+      stars.forEach(st => {
+        st.x -= st.speed;
+        if(st.x < 0) {
+          st.x = w;
+          st.y = Math.random()*h;
+        }
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.beginPath();
+        ctx.arc(st.x, st.y, st.r, 0, Math.PI*2);
+        ctx.fill();
+      });
+
+      // Simple cockpit grid vectors
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(20, 20, w-40, h-40);
+      ctx.beginPath();
+      ctx.moveTo(0,0); ctx.lineTo(20,20);
+      ctx.moveTo(w,0); ctx.lineTo(w-20,20);
+      ctx.moveTo(0,h); ctx.lineTo(20,h-20);
+      ctx.moveTo(w,h); ctx.lineTo(w-20,h-20);
+      ctx.stroke();
+    }
+
+    function drawNeonNexus(ctx, w, h, equalizers, tick) {
+      const startX = w / 2 - 120;
+      const barW = 16;
+      const gap = 4;
+
+      equalizers.forEach((val, idx) => {
+        // Oscillate height
+        const target = val + Math.sin(tick*0.08 + idx)*12;
+        const barH = Math.max(5, Math.min(130, target));
+        
+        ctx.fillStyle = `hsla(${190 + idx * 10}, 80%, 50%, 0.8)`;
+        ctx.fillRect(startX + idx * (barW + gap), h/2 - barH/2, barW, barH);
+      });
+    }
+
+    function drawAetherSails(ctx, w, h, tick) {
+      // Flowing particle wind lines
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.15)';
+      ctx.lineWidth = 1.5;
+      
+      const speed = tick * 2;
+      for (let y = 30; y < h; y += 40) {
+        ctx.beginPath();
+        for (let x = 0; x < w; x += 10) {
+          const wave = Math.sin((x + speed) * 0.02) * 12;
+          if (x === 0) ctx.moveTo(x, y + wave);
+          else ctx.lineTo(x, y + wave);
+        }
+        ctx.stroke();
+      }
+
+      // Sail ship triangle
+      const sX = w / 2;
+      const sY = h / 2;
+      
+      ctx.fillStyle = '#d4a373';
+      ctx.beginPath();
+      ctx.moveTo(sX - 15, sY + 20);
+      ctx.lineTo(sX + 15, sY + 20);
+      ctx.lineTo(sX, sY - 25);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawShadowCrypt(ctx, w, h, tick) {
+      // Dynamic flashlight light cone centered
+      const mouseX = w / 2 + Math.cos(tick*0.02) * 80;
+      const mouseY = h / 2 + Math.sin(tick*0.03) * 40;
+
+      // Dark background overlay
+      ctx.fillStyle = '#020205';
+      ctx.fillRect(0, 0, w, h);
+
+      // Light gradient mask
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      const radGrad = ctx.createRadialGradient(mouseX, mouseY, 10, mouseX, mouseY, 75);
+      radGrad.addColorStop(0, 'rgba(0, 0, 0, 1.0)');
+      radGrad.addColorStop(1, 'rgba(0, 0, 0, 0.0)');
+      ctx.fillStyle = radGrad;
+      ctx.beginPath();
+      ctx.arc(mouseX, mouseY, 75, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+
+      // Draw red glowing beast eyes inside dark areas (behind composite)
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(w*0.3, h*0.3, 2, 0, Math.PI*2);
+      ctx.arc(w*0.3+6, h*0.3, 2, 0, Math.PI*2);
+      ctx.arc(w*0.7, h*0.7, 2, 0, Math.PI*2);
+      ctx.arc(w*0.7+6, h*0.7, 2, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    function drawTerminalCore(ctx, w, h, tick) {
+      ctx.fillStyle = '#040d06';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.font = '10px "Fira Code", monospace';
+      ctx.fillStyle = '#22c55e';
+
+      for (let i = 0; i < 15; i++) {
+        const lineY = 25 + i * 18;
+        const randHex = Math.floor(Math.random()*16777215).toString(16).toUpperCase();
+        ctx.fillText(`THR:${i} [SYNC] CYCLE:${tick + i*15} MEM:0x${randHex} ... ACTIVE`, 15, lineY);
+      }
+    }
+
+    function drawBionicSwarm(ctx, w, h, cells) {
+      // Organic petri dish
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(w/2, h/2, 110, 0, Math.PI*2);
+      ctx.stroke();
+
+      cells.forEach(c => {
+        c.x += c.vx;
+        c.y += c.vy;
+
+        // Collision bounds (Petri dish circle limit)
+        const dx = c.x - w/2;
+        const dy = c.y - h/2;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist > 110 - c.r) {
+          c.vx *= -1;
+          c.vy *= -1;
+          c.x = w/2 + (dx / dist) * (110 - c.r);
+          c.y = h/2 + (dy / dist) * (110 - c.r);
+        }
+
+        ctx.fillStyle = c.color;
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.r, 0, Math.PI*2);
+        ctx.fill();
+
+        // Draw nucleus
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.beginPath();
+        ctx.arc(c.x - c.r*0.2, c.y - c.r*0.2, c.r*0.3, 0, Math.PI*2);
+        ctx.fill();
+      });
+    }
+
+  </script>
+</body>
+</html>

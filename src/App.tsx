@@ -8,6 +8,8 @@ import Library from './components/Library';
 import ProfileDashboard from './components/ProfileDashboard';
 import DevPortal from './components/DevPortal';
 import GameDetailModal from './components/GameDetailModal';
+import TermsOfService from './components/TermsOfService';
+import PrivacyPolicy from './components/PrivacyPolicy';
 import { Gamepad2, Layers, Settings, User as UserIcon } from 'lucide-react';
 import { startSSOBackgroundCheck } from './shared/auth/sso-helper';
 
@@ -19,6 +21,17 @@ export default function App() {
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'error' } | null>(null);
+  const [showLegal, setShowLegal] = useState<'terms' | 'privacy' | 'none'>('none');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const viewParam = params.get('view');
+    if (viewParam === 'privacy') {
+      setShowLegal('privacy');
+    } else if (viewParam === 'terms') {
+      setShowLegal('terms');
+    }
+  }, []);
   
   // Performance mode state & effect
   const [performanceMode, setPerformanceMode] = useState<boolean>(() => {
@@ -263,7 +276,15 @@ export default function App() {
       )}
 
       {/* FOOTER */}
-      <Footer />
+      <Footer onNavigate={(page) => setShowLegal(page)} />
+
+      {/* LEGAL OVERLAYS */}
+      {showLegal === 'terms' && (
+        <TermsOfService onBack={() => setShowLegal('none')} />
+      )}
+      {showLegal === 'privacy' && (
+        <PrivacyPolicy onBack={() => setShowLegal('none')} />
+      )}
 
       {/* MOBILE BOTTOM NAVIGATION */}
       <nav className="mobile-nav">
