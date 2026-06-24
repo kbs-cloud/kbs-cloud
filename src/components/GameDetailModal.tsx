@@ -7,18 +7,30 @@ export interface GameDetailModalProps {
   onClose: () => void;
   user: UserProfile | null;
   getLaunchUrl: (game: Game) => string;
+  isOffline: boolean;
+  installed: boolean;
+  onInstallToggle: (installed: boolean) => void;
 }
 
 export default function GameDetailModal({
   game,
   onClose,
   user,
-  getLaunchUrl
+  getLaunchUrl,
+  isOffline,
+  installed,
+  onInstallToggle
 }: GameDetailModalProps) {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loadingAchievements, setLoadingAchievements] = useState(false);
+  const [isInstalling, setIsInstalling] = useState(false);
 
   useEffect(() => {
+    // If offline, fetch fails, fallback to cache/mock or show empty
+    if (isOffline) {
+      setAchievements([]);
+      return;
+    }
     setTimeout(() => setLoadingAchievements(true), 0);
     fetch(`/api/apps/${game.id}/achievements`)
       .then(res => res.json())
@@ -29,7 +41,19 @@ export default function GameDetailModal({
       })
       .catch(err => console.error('Error fetching achievements:', err))
       .finally(() => setLoadingAchievements(false));
-  }, [game]);
+  }, [game, isOffline]);
+
+  const handleInstallSim = () => {
+    setIsInstalling(true);
+    setTimeout(() => {
+      setIsInstalling(false);
+      onInstallToggle(true);
+    }, 1500); // 1.5s simulated download/installation
+  };
+
+  const handleUninstall = () => {
+    onInstallToggle(false);
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -55,11 +79,42 @@ export default function GameDetailModal({
         </div>
 
         <div className="game-detail-body">
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
-            <a href={getLaunchUrl(game)} target="_blank" rel="noreferrer" className="btn btn-primary">
-              Launch Game <ExternalLink size={16} />
-            </a>
-            
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
+            {installed ? (
+              <>
+                {isOffline && game.isOnline ? (
+                  <button className="btn btn-secondary" disabled title="Requires active internet connection to authenticate.">
+                    Online Only (Locked Offline)
+                  </button>
+                ) : (
+                  <a href={getLaunchUrl(game)} target="_blank" rel="noreferrer" className="btn btn-primary">
+                    Launch Game {isOffline ? '(Offline)' : ''} <ExternalLink size={16} />
+                  </a>
+                )}
+                
+                <button className="btn btn-secondary text-danger" onClick={handleUninstall}>
+                  Uninstall
+                </button>
+              </>
+            ) : (
+              <button 
+                className="btn btn-primary" 
+                onClick={handleInstallSim} 
+                disabled={isInstalling || (isOffline && !game.download_url)}
+              >
+                {isInstalling ? (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: '2px solid #fff', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />
+                    Installing...
+                  </span>
+                ) : (
+                  <>
+                    <Download size={16} /> Install Game
+                  </>
+                )}
+              </button>
+            )}
+
             {/* External GitHub Link */}
             {game.github_url && (
               <a href={game.github_url} target="_blank" rel="noreferrer" className="btn btn-secondary">
@@ -70,7 +125,7 @@ export default function GameDetailModal({
             {/* Download URL for offline version */}
             {game.download_url && (
               <a href={game.download_url} target="_blank" rel="noreferrer" className="btn btn-secondary">
-                <Download size={16} /> Offline Downloads
+                <Download size={16} /> Standalone Package
               </a>
             )}
           </div>

@@ -1,0 +1,6 @@
+{
+  "appId": "com.kbscloud.hub",
+  "appName": "KBS Cloud Hub",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

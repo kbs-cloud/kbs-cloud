@@ -1,17 +1,22 @@
-import { ChevronDown, User, Settings, Layers, LogOut, Zap, ZapOff } from 'lucide-react';
+import { ChevronDown, User, Settings, Layers, LogOut, Zap, ZapOff, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import type { UserProfile } from '../types';
 
 export interface HeaderProps {
   user: UserProfile | null;
   loadingSession: boolean;
-  activeTab: 'store' | 'library' | 'profile' | 'developer';
-  setActiveTab: (tab: 'store' | 'library' | 'profile' | 'developer') => void;
+  activeTab: 'store' | 'library' | 'profile' | 'developer' | 'downloads' | 'testing';
+  setActiveTab: (tab: 'store' | 'library' | 'profile' | 'developer' | 'downloads' | 'testing') => void;
   showDropdown: boolean;
   setShowDropdown: (show: boolean) => void;
   handleSignIn: () => void;
   handleSignOut: () => void;
   performanceMode: boolean;
   setPerformanceMode: (mode: boolean) => void;
+  isOffline: boolean;
+  toggleOfflineMode: () => void;
+  pendingSyncCount: number;
+  isSyncing: boolean;
+  onSync: () => void;
 }
 
 export default function Header({
@@ -24,7 +29,12 @@ export default function Header({
   handleSignIn,
   handleSignOut,
   performanceMode,
-  setPerformanceMode
+  setPerformanceMode,
+  isOffline,
+  toggleOfflineMode,
+  pendingSyncCount,
+  isSyncing,
+  onSync
 }: HeaderProps) {
   return (
     <header className="navbar">
@@ -57,6 +67,24 @@ export default function Header({
               My Library
             </button>
           </li>
+          <li>
+            <button 
+              className={`nav-link ${activeTab === 'downloads' ? 'active' : ''}`}
+              onClick={() => setActiveTab('downloads')}
+              style={{ background: 'none', border: 'none' }}
+            >
+              Downloads
+            </button>
+          </li>
+          <li>
+            <button 
+              className={`nav-link ${activeTab === 'testing' ? 'active' : ''}`}
+              onClick={() => setActiveTab('testing')}
+              style={{ background: 'none', border: 'none' }}
+            >
+              Test Builds
+            </button>
+          </li>
           {user && (
             <li>
               <button 
@@ -72,6 +100,58 @@ export default function Header({
       </nav>
 
       <div className="navbar-actions">
+        {/* Offline / Online Status Badge */}
+        <button
+          onClick={toggleOfflineMode}
+          className={`btn btn-sm ${isOffline ? 'btn-outline-orange' : 'btn-outline-green'}`}
+          title={isOffline ? "Forced Offline: Click to reconnect" : "Online: Click to simulate offline mode"}
+          style={{
+            borderColor: isOffline ? 'var(--orange)' : 'var(--green)',
+            color: isOffline ? 'var(--orange)' : 'var(--green)',
+            background: 'rgba(0, 0, 0, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}
+        >
+          {isOffline ? <WifiOff size={14} /> : <Wifi size={14} />}
+          <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>
+            {isOffline ? 'OFFLINE' : 'ONLINE'}
+          </span>
+        </button>
+
+        {/* Sync queue indicator */}
+        {pendingSyncCount > 0 && (
+          <button
+            onClick={onSync}
+            disabled={isSyncing || isOffline}
+            className="btn btn-secondary btn-sm"
+            title={isOffline ? "Sync pending: Cannot sync while offline" : `Sync pending: ${pendingSyncCount} changes. Click to sync.`}
+            style={{
+              borderColor: 'var(--cyan)',
+              color: 'var(--cyan)',
+              background: 'rgba(0, 255, 255, 0.05)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              cursor: isOffline ? 'not-allowed' : 'pointer',
+              opacity: isOffline ? 0.5 : 1
+            }}
+          >
+            <RefreshCw 
+              size={12} 
+              className={isSyncing ? 'anim-spin' : ''} 
+              style={{ 
+                animation: isSyncing ? 'spin 1s linear infinite' : 'none',
+                marginRight: '2px'
+              }} 
+            />
+            <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>
+              SYNC ({pendingSyncCount})
+            </span>
+          </button>
+        )}
+
         <button
           onClick={() => setPerformanceMode(!performanceMode)}
           className={`btn btn-secondary btn-sm btn-perf-toggle ${performanceMode ? 'perf-active' : ''}`}

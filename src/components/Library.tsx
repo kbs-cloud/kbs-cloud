@@ -8,6 +8,10 @@ export interface LibraryProps {
   setSelectedGame: (game: Game | null) => void;
   getLaunchUrl: (game: Game) => string;
   handleSignIn: () => void;
+  isOffline: boolean;
+  installedApps: string[];
+  onInstallToggle: (gameId: string, installed: boolean) => void;
+  showToastMsg: (msg: string, type?: 'success' | 'info' | 'error') => void;
 }
 
 export default function Library({
@@ -16,7 +20,11 @@ export default function Library({
   loadingGames,
   setSelectedGame,
   getLaunchUrl,
-  handleSignIn
+  handleSignIn,
+  isOffline,
+  installedApps,
+  onInstallToggle,
+  showToastMsg
 }: LibraryProps) {
   return (
     <div style={{ marginTop: '20px' }}>
@@ -49,9 +57,31 @@ export default function Library({
                   </div>
 
                   <div className="library-card-actions">
-                    <a href={getLaunchUrl(game)} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm launch-btn">
-                      Launch Game
-                    </a>
+                    {installedApps.includes(game.id) ? (
+                      isOffline && game.isOnline ? (
+                        <button className="btn btn-secondary btn-sm launch-btn" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }} title="Requires active internet connection.">
+                          Locked Offline
+                        </button>
+                      ) : (
+                        <a href={getLaunchUrl(game)} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm launch-btn">
+                          Launch Game
+                        </a>
+                      )
+                    ) : (
+                      <button 
+                        className="btn btn-primary btn-sm launch-btn"
+                        onClick={() => {
+                          showToastMsg(`Downloading cached client files for ${game.title}...`, 'info');
+                          setTimeout(() => {
+                            onInstallToggle(game.id, true);
+                            showToastMsg(`${game.title} successfully installed!`, 'success');
+                          }, 1000);
+                        }}
+                        disabled={isOffline && !game.download_url}
+                      >
+                        Install Game
+                      </button>
+                    )}
                     <button className="btn btn-secondary btn-sm details-btn" onClick={() => setSelectedGame(game)}>
                       Details
                     </button>

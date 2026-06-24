@@ -8,6 +8,9 @@ KBS Cloud Hub is the central portal for kbs-cloud.com, providing a responsive sc
 - **SSO Authentication:** Sign in securely via KBS Auth SSO.
 - **Responsive Design:** Mobile-first sci-fi glassmorphic UI.
 - **Dual-Port Serving:** Custom static and API proxying architecture.
+- **Offline Cache & DB Sync:** Run in full offline mode with local storage caches for catalog data, and automatically sync profile changes, achievements, and installations to the SQLite database when online.
+- **Multi-Platform Deliverability:** Integrated setups for Electron and Capacitor to package the hub as native applications for Windows, macOS, Linux, Android, and iOS.
+- **Client Downloads Directory:** Dedicated downloads portal linking directly to latest platform release binaries.
 
 ## Port Assignments
 

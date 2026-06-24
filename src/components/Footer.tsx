@@ -2,9 +2,10 @@ import { Gamepad2 } from 'lucide-react';
 
 interface FooterProps {
   onNavigate: (page: 'terms' | 'privacy') => void;
+  onNavigateTab?: (tab: 'store' | 'library' | 'profile' | 'developer' | 'downloads') => void;
 }
 
-export default function Footer({ onNavigate }: FooterProps) {
+export default function Footer({ onNavigate, onNavigateTab }: FooterProps) {
   const linkStyle: React.CSSProperties = {
     background: 'none',
     border: 'none',
@@ -33,6 +34,34 @@ export default function Footer({ onNavigate }: FooterProps) {
           <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>KBS Cloud Games Store</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {onNavigateTab && (
+            <>
+              <a
+                href="#downloads"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onNavigateTab('downloads');
+                }}
+                style={linkStyle}
+                onMouseEnter={(e) => e.currentTarget.style.color = 'var(--cyan)'}
+                onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
+              >
+                Downloads
+              </a>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', opacity: 0.5 }}>|</span>
+            </>
+          )}
+          <a
+            href="https://github.com/kbs-cloud/kbs-cloud/releases"
+            target="_blank"
+            rel="noreferrer"
+            style={linkStyle}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--cyan)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
+          >
+            Releases
+          </a>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', opacity: 0.5 }}>|</span>
           <a
             href="/?view=terms"
             onClick={(e) => {

@@ -131,6 +131,16 @@ async function initDatabase() {
       )
     `);
 
+    // 7. Create USER_INSTALLS table
+    await dbRun(`
+      CREATE TABLE IF NOT EXISTS user_installs (
+        email TEXT REFERENCES user_profiles(email) ON DELETE CASCADE,
+        app_id TEXT REFERENCES apps(id) ON DELETE CASCADE,
+        installed_at TEXT,
+        PRIMARY KEY (email, app_id)
+      )
+    `);
+
     console.log('Database schema verified/created successfully.');
 
     // Seed default applications

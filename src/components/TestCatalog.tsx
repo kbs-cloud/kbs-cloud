@@ -1,69 +1,58 @@
-import { Gamepad2, Search, ExternalLink, Info } from 'lucide-react';
+import { FlaskConical, Search } from 'lucide-react';
 import type { Game } from '../types';
 
-export interface StorefrontProps {
+export interface TestCatalogProps {
   games: Game[];
   loadingGames: boolean;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   setSelectedGame: (game: Game | null) => void;
-  getLaunchUrl: (game: Game) => string;
   isOffline: boolean;
   installedApps: string[];
   onInstallToggle: (gameId: string, installed: boolean) => void;
   showToastMsg: (msg: string, type?: 'success' | 'info' | 'error') => void;
 }
 
-export default function Storefront({
+export default function TestCatalog({
   games,
   loadingGames,
   searchQuery,
   setSearchQuery,
   setSelectedGame,
-  getLaunchUrl,
   isOffline,
   installedApps,
   onInstallToggle,
   showToastMsg
-}: StorefrontProps) {
-  const filteredGames = games.filter(game => {
+}: TestCatalogProps) {
+  // Filter games: Must have a dev_url to be testable
+  const testableGames = games.filter(game => game.dev_url && game.dev_url.trim() !== '');
+
+  const filteredGames = testableGames.filter(game => {
     const matchesQuery = game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          (game.tags && game.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
     return matchesQuery;
   });
 
-  const featuredGame = games.length > 0 ? games[0] : null;
+  const getTestLaunchUrl = (game: Game) => {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return game.dev_url;
+    }
+    return `${window.location.origin}/test/${game.id}/`;
+  };
 
   return (
-    <>
-      {/* HERO BANNER */}
-      {featuredGame && (
-        <div className="hero-banner">
-          <img src={featuredGame.cover_image} alt={featuredGame.title} className="hero-image" />
-          <div className="hero-overlay">
-            <span className="hero-badge">Featured Game</span>
-            <h1 className="hero-title">{featuredGame.title} Out Now</h1>
-            <p className="hero-description">
-              {featuredGame.description}
-            </p>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <a href={getLaunchUrl(featuredGame)} target="_blank" rel="noreferrer" className="btn btn-primary">
-                Play Now <ExternalLink size={16} />
-              </a>
-              <button className="btn btn-secondary" onClick={() => setSelectedGame(featuredGame)}>
-                <Info size={16} /> Details
-              </button>
-            </div>
-          </div>
+    <div style={{ marginTop: '20px' }}>
+      {/* HEADER SECTION */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: 0 }}>
+            <FlaskConical size={24} style={{ color: 'var(--orange)' }} /> 
+            Test Builds Portal
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '6px', maxWidth: '600px' }}>
+            Access experimental sandboxes, staging versions, and active developer branches deployed from the staging servers.
+          </p>
         </div>
-      )}
-
-      {/* STOREFRONT GRID */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h2 className="section-title">
-          <Gamepad2 size={24} style={{ color: 'var(--cyan)' }} /> 
-          Explore Games
-        </h2>
 
         <div style={{
           display: 'flex',
@@ -78,7 +67,7 @@ export default function Storefront({
           <Search size={16} style={{ color: 'var(--text-muted)' }} />
           <input 
             type="text" 
-            placeholder="Search game catalog..." 
+            placeholder="Search test builds..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -95,18 +84,18 @@ export default function Storefront({
       </div>
 
       {loadingGames ? (
-        <div style={{ textAlign: 'center', padding: '60px', color: 'var(--cyan)' }}>
-          Loading game catalogue database...
+        <div style={{ textAlign: 'center', padding: '60px', color: 'var(--orange)' }}>
+          Loading staging environment catalog...
         </div>
       ) : (
         <div className="game-grid">
           {filteredGames.length > 0 ? (
             filteredGames.map(game => (
-              <div key={game.id} className="game-card glass-panel glass-panel-interactive">
+              <div key={game.id} className="game-card glass-panel glass-panel-interactive" style={{ borderTop: '2px solid rgba(249, 115, 22, 0.4)' }}>
                 <div className="game-card-img-wrapper">
                   <img src={game.cover_image || '/starswarm_cover.png'} alt={game.title} className="game-card-img" />
-                  <span className="game-card-status-badge">
-                    {game.icon} Available
+                  <span className="game-card-status-badge" style={{ background: 'rgba(249, 115, 22, 0.2)', border: '1px solid rgba(249, 115, 22, 0.4)', color: 'var(--orange)' }}>
+                    🧪 Testing Build
                   </span>
                 </div>
 
@@ -135,18 +124,19 @@ export default function Storefront({
                             Locked
                           </button>
                         ) : (
-                          <a href={getLaunchUrl(game)} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm">
-                            Play
+                          <a href={getTestLaunchUrl(game)} target="_blank" rel="noreferrer" className="btn btn-sm" style={{ background: 'linear-gradient(135deg, var(--orange) 0%, #ea580c 100%)', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 8px', fontSize: '0.85rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            Play Staging
                           </a>
                         )
                       ) : (
                         <button 
-                          className="btn btn-primary btn-sm" 
+                          className="btn btn-sm" 
+                          style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid var(--border-glass)', color: '#fff' }}
                           onClick={() => {
-                            showToastMsg(`Downloading cached client for ${game.title}...`, 'info');
+                            showToastMsg(`Downloading cached client for ${game.title} (Test Build)...`, 'info');
                             setTimeout(() => {
                               onInstallToggle(game.id, true);
-                              showToastMsg(`${game.title} ready to launch!`, 'success');
+                              showToastMsg(`${game.title} ready for testing!`, 'success');
                             }, 1000);
                           }}
                           disabled={isOffline && !game.download_url}
@@ -166,11 +156,11 @@ export default function Storefront({
               padding: '60px 20px',
               color: 'var(--text-muted)'
             }}>
-              No games found matching your search.
+              No test builds found.
             </div>
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }

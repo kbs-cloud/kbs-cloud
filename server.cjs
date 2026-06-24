@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
 const crypto = require('crypto');
+const http = require('http');
 const { initDatabase, dbRun, dbGet, dbAll } = require('./db.cjs');
 
 // Helper function to promote the single user to global Admin
@@ -403,6 +404,115 @@ app.get('/api/profile/achievements', async (req, res) => {
     `;
     const rows = await dbAll(sql, [session.email]);
     res.json({ success: true, achievements: rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// App installation endpoints
+app.get('/api/profile/installs', async (req, res) => {
+  const sessionId = req.cookies['hub_session_id'];
+  if (!sessionId || !sessions.has(sessionId)) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const session = sessions.get(sessionId);
+
+  try {
+    const rows = await dbAll('SELECT app_id FROM user_installs WHERE email = ?', [session.email]);
+    const installs = rows.map(r => r.app_id);
+    res.json({ success: true, installs });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/profile/installs', async (req, res) => {
+  const sessionId = req.cookies['hub_session_id'];
+  if (!sessionId || !sessions.has(sessionId)) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const session = sessions.get(sessionId);
+  const { appId } = req.body;
+
+  if (!appId) {
+    return res.status(400).json({ error: 'Missing appId' });
+  }
+
+  try {
+    const now = new Date().toISOString();
+    await dbRun(
+      'INSERT OR REPLACE INTO user_installs (email, app_id, installed_at) VALUES (?, ?, ?)',
+      [session.email, appId, now]
+    );
+    res.json({ success: true, message: `App ${appId} install recorded.` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/profile/installs/:appId', async (req, res) => {
+  const sessionId = req.cookies['hub_session_id'];
+  if (!sessionId || !sessions.has(sessionId)) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const session = sessions.get(sessionId);
+  const { appId } = req.params;
+
+  try {
+    await dbRun(
+      'DELETE FROM user_installs WHERE email = ? AND app_id = ?',
+      [session.email, appId]
+    );
+    res.json({ success: true, message: `App ${appId} uninstall recorded.` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/profile/achievements/unlock', async (req, res) => {
+  const sessionId = req.cookies['hub_session_id'];
+  if (!sessionId || !sessions.has(sessionId)) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const session = sessions.get(sessionId);
+  const { achievementId } = req.body;
+
+  if (!achievementId) {
+    return res.status(400).json({ error: 'Missing achievementId' });
+  }
+
+  try {
+    const ach = await dbGet('SELECT * FROM achievements WHERE id = ?', [achievementId]);
+    if (!ach) {
+      return res.status(404).json({ error: 'Achievement not found' });
+    }
+
+    const alreadyUnlocked = await dbGet(
+      'SELECT * FROM user_achievements WHERE email = ? AND achievement_id = ?',
+      [session.email, achievementId]
+    );
+    if (alreadyUnlocked) {
+      return res.json({ success: true, unlocked: false, message: 'Already unlocked' });
+    }
+
+    const now = new Date().toISOString();
+    await dbRun(
+      'INSERT INTO user_achievements (email, achievement_id, unlocked_at) VALUES (?, ?, ?)',
+      [session.email, achievementId, now]
+    );
+
+    const profile = await dbGet('SELECT * FROM user_profiles WHERE email = ?', [session.email]);
+    if (profile) {
+      const xpGained = ach.xp_value || 100;
+      const newXpTotal = profile.xp + xpGained;
+      const newLevel = Math.floor(newXpTotal / 500) + 1;
+      await dbRun(
+        'UPDATE user_profiles SET xp = ?, level = ?, updated_at = ? WHERE email = ?',
+        [newXpTotal, newLevel, now, session.email]
+      );
+    }
+
+    res.json({ success: true, unlocked: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -957,6 +1067,68 @@ app.get('/api/games-api/user/:email', authenticateGameToken, async (req, res) =>
   }
 });
 
+// Helper function to reverse proxy requests to dev/testing versions of apps
+async function handleTestProxy(req, res) {
+  const appId = req.params.appId;
+  try {
+    const appRecord = await dbGet('SELECT dev_url FROM apps WHERE id = ?', [appId]);
+    let targetUrl = null;
+    
+    if (appRecord && appRecord.dev_url) {
+      targetUrl = appRecord.dev_url;
+    } else if (appId === 'kbs-cloud' || appId === 'hub') {
+      targetUrl = 'http://localhost:28000';
+    } else if (appId === 'kbs-auth' || appId === 'auth') {
+      targetUrl = 'http://localhost:28001';
+    } else {
+      return res.status(404).send(`App "${appId}" test version not found or not registered.`);
+    }
+
+    const urlObj = new URL(targetUrl);
+    const targetHost = urlObj.hostname;
+    const targetPort = urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80);
+
+    // Rewrite path: extract everything after '/test/:appId/' using path-to-regexp v8 splat wildcard
+    let targetPath = '/' + (req.params.splat || '');
+
+    const connector = http.request({
+      host: targetHost,
+      port: targetPort,
+      path: targetPath,
+      method: req.method,
+      headers: req.headers
+    }, (connectorRes) => {
+      res.writeHead(connectorRes.statusCode, connectorRes.headers);
+      connectorRes.pipe(res);
+    });
+
+    req.pipe(connector);
+
+    connector.on('error', (err) => {
+      console.error(`[Test Proxy] Error for ${appId}:`, err.message);
+      if (!res.headersSent) {
+        res.status(502).send('Bad Gateway');
+      }
+    });
+  } catch (err) {
+    console.error(`[Test Proxy] Exception for ${appId}:`, err.message);
+    if (!res.headersSent) {
+      res.status(500).send('Internal Server Error');
+    }
+  }
+}
+
+// Redirect /test/:appId to /test/:appId/ to ensure proper relative asset resolution
+app.get('/test/:appId', (req, res, next) => {
+  if (!req.path.endsWith('/')) {
+    return res.redirect(301, req.path + '/');
+  }
+  next();
+});
+
+// Proxy test versions
+app.all('/test/:appId/{*splat}', handleTestProxy);
+
 // Serves the client SPA files in production
 app.use(express.static(path.join(__dirname, 'dist')));
 app.get('*splat', (req, res) => {
@@ -974,7 +1146,17 @@ app.listen(PORT, () => {
 
 if (process.env.FRONTEND_PORT && String(process.env.FRONTEND_PORT) !== String(PORT)) {
   const frontendApp = express();
-  const http = require('http');
+
+  // Redirect /test/:appId to /test/:appId/
+  frontendApp.get('/test/:appId', (req, res, next) => {
+    if (!req.path.endsWith('/')) {
+      return res.redirect(301, req.path + '/');
+    }
+    next();
+  });
+
+  // Proxy test versions
+  frontendApp.all('/test/:appId/{*splat}', handleTestProxy);
 
   // Proxy API requests to the backend server
   frontendApp.all('/api/*splat', (req, res) => {
