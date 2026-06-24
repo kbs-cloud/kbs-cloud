@@ -1,3 +1,14 @@
+## [0.6.1-alpha.3] - 2026-06-24
+
+## New Features
+
+- Added a portable Windows x64 ZIP package build (`kbs-cloud-hub-setup.zip`).
+
+## Bug Fixes
+
+- Fixed blank white screen in play windows when launching installed games from the library.
+- Enabled loading the local standalone version of games when launched in packaged desktop mode.
+
 ## [0.6.1-alpha.2] - 2026-06-24
 
 ## Bug Fixes
