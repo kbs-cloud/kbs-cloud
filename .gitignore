@@ -44,3 +44,6 @@ NEXT_CHANGELOG.md
 deploy.sh
 
 
+
+# Build outputs
+out/
