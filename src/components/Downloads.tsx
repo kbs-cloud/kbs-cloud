@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { Monitor, Apple, Terminal, Smartphone, Download, ShieldCheck, ExternalLink, HelpCircle } from 'lucide-react';
+import pkg from '../../package.json';
 
 export default function Downloads() {
   const [activeInstruction, setActiveInstruction] = useState<string | null>('windows');
+
+  const version = pkg.version;
+  const tag = `v${version}`;
 
   const platforms = [
     {
@@ -11,9 +15,9 @@ export default function Downloads() {
       icon: <Monitor size={36} className="platform-icon windows" />,
       tag: 'Windows 10 / 11 (64-bit)',
       size: '64.2 MB',
-      version: 'v1.2.0-stable',
+      version: tag,
       fileName: 'kbs-cloud-hub-setup.exe',
-      downloadUrl: 'https://github.com/kbs-cloud/kbs-cloud/releases/latest/download/kbs-cloud-hub-setup.exe',
+      downloadUrl: `https://github.com/kbs-cloud/kbs-cloud/releases/download/${tag}/kbs-cloud-hub-setup.exe`,
       instructions: [
         'Download the setup executable.',
         'Double-click kbs-cloud-hub-setup.exe to run the installer.',
@@ -27,9 +31,9 @@ export default function Downloads() {
       icon: <Apple size={36} className="platform-icon macos" />,
       tag: 'macOS 12+ (Universal)',
       size: '68.5 MB',
-      version: 'v1.2.0-stable',
+      version: tag,
       fileName: 'kbs-cloud-hub.dmg',
-      downloadUrl: 'https://github.com/kbs-cloud/kbs-cloud/releases/latest/download/kbs-cloud-hub.dmg',
+      downloadUrl: `https://github.com/kbs-cloud/kbs-cloud/releases/download/${tag}/kbs-cloud-hub.dmg`,
       instructions: [
         'Download the Apple disk image (.dmg).',
         'Double-click kbs-cloud-hub.dmg to open.',
@@ -43,9 +47,9 @@ export default function Downloads() {
       icon: <Terminal size={36} className="platform-icon linux" />,
       tag: 'Ubuntu / Debian / Fedora',
       size: '70.1 MB',
-      version: 'v1.2.0-stable',
+      version: tag,
       fileName: 'kbs-cloud-hub.AppImage',
-      downloadUrl: 'https://github.com/kbs-cloud/kbs-cloud/releases/latest/download/kbs-cloud-hub.AppImage',
+      downloadUrl: `https://github.com/kbs-cloud/kbs-cloud/releases/download/${tag}/kbs-cloud-hub.AppImage`,
       instructions: [
         'Download the .AppImage package.',
         'Open terminal, navigate to download directory, and execute: chmod +x kbs-cloud-hub.AppImage',
@@ -59,9 +63,9 @@ export default function Downloads() {
       icon: <Smartphone size={36} className="platform-icon android" />,
       tag: 'Android 9.0+',
       size: '18.4 MB',
-      version: 'v1.2.0-beta',
+      version: tag,
       fileName: 'kbs-cloud-hub.apk',
-      downloadUrl: 'https://github.com/kbs-cloud/kbs-cloud/releases/latest/download/kbs-cloud-hub.apk',
+      downloadUrl: `https://github.com/kbs-cloud/kbs-cloud/releases/download/${tag}/kbs-cloud-hub.apk`,
       instructions: [
         'Download the android package (.apk) directly to your device.',
         'If prompted by your browser, enable "Install from Unknown Sources".',
@@ -75,7 +79,7 @@ export default function Downloads() {
       icon: <Smartphone size={36} className="platform-icon ios" />,
       tag: 'iOS 15.0+ / iPadOS',
       size: '12.8 MB',
-      version: 'v1.2.0-beta (TestFlight)',
+      version: `${tag} (TestFlight)`,
       fileName: 'Install via Apple TestFlight',
       downloadUrl: 'https://github.com/kbs-cloud/kbs-cloud/releases',
       instructions: [
