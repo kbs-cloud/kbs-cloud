@@ -1,3 +1,9 @@
+## [0.6.1-alpha.2] - 2026-06-24
+
+## Bug Fixes
+
+- Fixed a blank white screen issue when launching the packaged Windows desktop application by using relative assets paths.
+
 ## [0.6.1-alpha.1] - 2026-06-24
 
 # Changelog
