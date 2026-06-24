@@ -1,3 +1,9 @@
+## [0.6.1-alpha.4] - 2026-06-24
+
+# Next Changelog
+
+- No changes yet.
+
 ## [0.6.1-alpha.3] - 2026-06-24
 
 ## New Features
