@@ -12,8 +12,24 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      sandbox: true
+      sandbox: true,
+      webSecurity: false // Allow ES module scripts to load over file:// protocol
     }
+  });
+
+  // Ensure child windows opened via window.open (e.g. games) also have webSecurity: false to load ES modules
+  mainWindow.webContents.setWindowOpenHandler((details) => {
+    return {
+      action: 'allow',
+      overrideBrowserWindowOptions: {
+        webPreferences: {
+          nodeIntegration: false,
+          contextIsolation: true,
+          sandbox: true,
+          webSecurity: false
+        }
+      }
+    };
   });
 
   // In production, load the built HTML bundle. In development, try dev port.

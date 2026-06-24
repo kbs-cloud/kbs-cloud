@@ -329,6 +329,31 @@ export default function App() {
   };
 
   const getLaunchUrl = (game: Game) => {
+    const isLocalFileMode = window.location.protocol === 'file:';
+    
+    const getGameFolder = (gameId: string) => {
+      switch (gameId) {
+        case 'tickerclash': return 'ticker-clash';
+        case 'sudoku': return 'sudoku-neon';
+        case 'alchemist': return 'alchemists-crucible';
+        default: return gameId; // 'starswarm', 'retrosweeper', 'gridlock-neon', 'sudoku-neon'
+      }
+    };
+
+    if (isLocalFileMode && installedApps.includes(game.id)) {
+      const folderName = getGameFolder(game.id);
+      const pathname = window.location.pathname;
+      const wsMarker = '/kbs-cloud/kbs-cloud/';
+      const wsIndex = pathname.indexOf(wsMarker);
+      
+      if (wsIndex !== -1) {
+        const workspaceRoot = pathname.substring(0, wsIndex);
+        return `file://${workspaceRoot}/kbs-cloud/${folderName}/dist/index.html`;
+      }
+      
+      return `../../../games/${folderName}/dist/index.html`;
+    }
+
     if (activeTab === 'testing') {
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         return game.dev_url;

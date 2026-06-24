@@ -21,7 +21,10 @@
       "artifactName": "kbs-cloud-hub.${ext}"
     },
     "win": {
-      "target": "nsis",
+      "target": [
+        "nsis",
+        "zip"
+      ],
       "artifactName": "kbs-cloud-hub-setup.${ext}"
     },
     "mac": {
