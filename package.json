@@ -3,6 +3,32 @@
   "private": true,
   "version": "0.6.1-alpha.1",
   "type": "module",
+  "main": "electron-main.cjs",
+  "build": {
+    "appId": "com.kbscloud.hub",
+    "productName": "KBS Cloud Hub",
+    "npmRebuild": false,
+    "directories": {
+      "output": "out"
+    },
+    "files": [
+      "dist/**/*",
+      "electron-main.cjs",
+      "package.json"
+    ],
+    "linux": {
+      "target": "AppImage",
+      "artifactName": "kbs-cloud-hub.${ext}"
+    },
+    "win": {
+      "target": "nsis",
+      "artifactName": "kbs-cloud-hub-setup.${ext}"
+    },
+    "mac": {
+      "target": "zip",
+      "artifactName": "kbs-cloud-hub.${ext}"
+    }
+  },
   "scripts": {
     "dev": "concurrently \"node server.cjs\" \"vite\"",
     "build": "tsc -b && vite build",
@@ -11,6 +37,13 @@
     "electron:dev": "concurrently \"node server.cjs\" \"vite\" \"wait-on http://localhost:19000 && electron .\"",
     "electron:build": "npm run build && electron-builder",
     "cap:sync": "npm run build && npx cap sync",
+    "android:init": "npx cap init \"KBS Cloud Hub\" \"com.kbscloud.hub\" --web-dir=dist",
+    "android:add": "npx cap add android",
+    "android:sync": "npm run build && npx cap sync android",
+    "package:apk": "export ANDROID_HOME=/home/gemini/android-sdk && export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 && export PATH=$PATH:$ANDROID_HOME/platform-tools && npm run android:sync && cd android && ./gradlew assembleDebug && mkdir -p ../out && cp app/build/outputs/apk/debug/app-debug.apk ../out/kbs-cloud-hub.apk",
+    "ios:init": "npx cap init \"KBS Cloud Hub\" \"com.kbscloud.hub\" --web-dir=dist",
+    "ios:add": "npx cap add ios",
+    "ios:sync": "npm run build && npx cap sync ios",
     "release": "node ../scripts/release.js"
   },
   "dependencies": {
@@ -25,6 +58,7 @@
     "sqlite3": "^6.0.1"
   },
   "devDependencies": {
+    "@capacitor/android": "^6.2.1",
     "@capacitor/cli": "^6.0.0",
     "@eslint/js": "^10.0.1",
     "@types/cookie-parser": "^1.4.10",
