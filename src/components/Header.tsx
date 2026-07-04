@@ -1,5 +1,6 @@
 import { ChevronDown, User, Settings, Layers, LogOut, Zap, ZapOff, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import type { UserProfile } from '../types';
+import { resolveImageUrl } from '../shared/offlineDb';
 
 export interface HeaderProps {
   user: UserProfile | null;
@@ -39,7 +40,7 @@ export default function Header({
   return (
     <header className="navbar">
       <a href="/" className="navbar-brand" onClick={(e) => { e.preventDefault(); setActiveTab('store'); }}>
-        <img src="/logo.png" className="logo-glow" style={{ height: '32px', width: '32px', borderRadius: '4px', objectFit: 'cover' }} alt="KBS Cloud" />
+        <img src={resolveImageUrl('/logo.png')} className="logo-glow" style={{ height: '32px', width: '32px', borderRadius: '4px', objectFit: 'cover' }} alt="KBS Cloud" />
         <span className="navbar-brand-text" style={{ letterSpacing: '1px' }}>
           <span style={{ fontWeight: 800 }}>KBS</span>
           <span className="brand-cloud" style={{ color: 'var(--cyan)', fontWeight: 400 }}>CLOUD</span>

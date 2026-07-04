@@ -282,11 +282,19 @@ export default function App() {
     fetchAppsList();
     fetchInstallsList();
 
+    const syncInterval = setInterval(() => {
+      if (!OfflineManager.isOffline()) {
+        fetchAppsList();
+        fetchInstallsList();
+      }
+    }, 60000);
+
     return () => {
       active = false;
       if (cleanupBackgroundCheck) {
         cleanupBackgroundCheck();
       }
+      clearInterval(syncInterval);
       window.removeEventListener('kbs_network_state_change', handleNetworkChange);
       window.removeEventListener('online', handleNetworkChange);
       window.removeEventListener('offline', handleNetworkChange);
@@ -307,9 +315,50 @@ export default function App() {
   };
 
   const handleSignIn = () => {
+    const isPackaged = window.location.protocol === 'file:' || 
+                       window.location.hostname === '' ||
+                       navigator.userAgent.toLowerCase().includes('electron');
+                       
     const authUrl = getAuthServerUrl();
-    const redirectUri = encodeURIComponent(`${window.location.origin}/api/auth/callback`);
-    window.location.href = `${authUrl}/api/auth/authorize?client_id=kbs-cloud&redirect_uri=${redirectUri}`;
+    
+    if (isPackaged) {
+      // In packaged Electron mode, open a popup window to prevent navigating the main app frame.
+      // Redirect back to the production backend callback, passing source=iframe to get postMessage callback.
+      const isLocalFile = window.location.protocol === 'file:' || window.location.hostname === '';
+      const backendOrigin = isLocalFile ? 'https://kbs-cloud.com' : 'http://localhost:29000';
+      
+      const redirectUri = encodeURIComponent(`${backendOrigin}/api/auth/callback?source=iframe`);
+      const targetUrl = `${authUrl}/api/auth/authorize?client_id=kbs-cloud&redirect_uri=${redirectUri}`;
+      
+      const loginWindow = window.open(targetUrl, '_blank', 'width=600,height=700');
+      
+      const handleMessage = (event: MessageEvent) => {
+        if (event.data && event.data.type === 'SSO_LOGIN_SUCCESS') {
+          if (loginWindow && !loginWindow.closed) {
+            loginWindow.close();
+          }
+          window.removeEventListener('message', handleMessage);
+          fetchSession();
+          fetchAppsList();
+          fetchInstallsList();
+        }
+      };
+      
+      window.addEventListener('message', handleMessage);
+      
+      const checkClosed = setInterval(() => {
+        if (!loginWindow || loginWindow.closed) {
+          clearInterval(checkClosed);
+          window.removeEventListener('message', handleMessage);
+          fetchSession();
+          fetchAppsList();
+          fetchInstallsList();
+        }
+      }, 1000);
+    } else {
+      const redirectUri = encodeURIComponent(`${window.location.origin}/api/auth/callback`);
+      window.location.href = `${authUrl}/api/auth/authorize?client_id=kbs-cloud&redirect_uri=${redirectUri}`;
+    }
   };
 
   const handleSignOut = async () => {
@@ -340,6 +389,17 @@ export default function App() {
       }
     };
 
+    const checkFileExists = (url: string): boolean => {
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('HEAD', url, false);
+        xhr.send();
+        return xhr.status === 200 || xhr.status === 0;
+      } catch {
+        return false;
+      }
+    };
+
     if (isLocalFileMode && installedApps.includes(game.id)) {
       const folderName = getGameFolder(game.id);
       const pathname = window.location.pathname;
@@ -351,7 +411,22 @@ export default function App() {
         return `file://${workspaceRoot}/kbs-cloud/${folderName}/dist/index.html`;
       }
       
-      return `../../../games/${folderName}/dist/index.html`;
+      const candidates = [
+        `../../../games/${folderName}/dist/index.html`,
+        `../../../games/${folderName}/resources/app/dist/index.html`,
+        `../../../games/${folderName}-win32-x64/resources/app/dist/index.html`,
+        `../../../games/${folderName}-linux-x64/resources/app/dist/index.html`,
+        `../../../games/${folderName}-darwin-x64/${folderName}.app/Contents/Resources/app/dist/index.html`,
+        `../../../games/${folderName}/${folderName}.app/Contents/Resources/app/dist/index.html`
+      ];
+
+      for (const candidate of candidates) {
+        if (checkFileExists(candidate)) {
+          return candidate;
+        }
+      }
+      
+      console.warn(`Local assets for ${game.title} not found at any candidate path. Falling back to production URL.`);
     }
 
     if (activeTab === 'testing') {

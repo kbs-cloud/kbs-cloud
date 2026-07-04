@@ -149,7 +149,7 @@ app.get('/api/auth/callback', async (req, res) => {
           <body>
             <script>
               if (window.opener) {
-                window.opener.postMessage({ type: 'SSO_LOGIN_SUCCESS' }, window.location.origin);
+                window.opener.postMessage({ type: 'SSO_LOGIN_SUCCESS' }, '*');
               } else {
                 window.parent.postMessage({ type: 'SSO_LOGIN_SUCCESS' }, window.location.origin);
               }
@@ -1067,6 +1067,40 @@ app.get('/api/games-api/user/:email', authenticateGameToken, async (req, res) =>
   }
 });
 
+app.get('/api/games-api/achievements', authenticateGameToken, async (req, res) => {
+  const { email } = req.query;
+  const appId = req.appId;
+  if (!email) {
+    return res.status(400).json({ error: 'Missing email query parameter' });
+  }
+
+  try {
+    const achievements = await dbAll('SELECT * FROM achievements WHERE app_id = ?', [appId]);
+    const unlocked = await dbAll('SELECT achievement_id, unlocked_at FROM user_achievements WHERE email = ?', [email]);
+    
+    const unlockedMap = new Map();
+    for (const u of unlocked) {
+      unlockedMap.set(u.achievement_id, u.unlocked_at);
+    }
+
+    const result = achievements.map(a => ({
+      id: a.id,
+      title: a.title,
+      description: a.description,
+      icon: a.icon,
+      xpValue: a.xp_value,
+      hidden: !!a.hidden,
+      unlocked: unlockedMap.has(a.id),
+      unlockedAt: unlockedMap.get(a.id) || null
+    }));
+
+    res.json({ success: true, achievements: result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // Helper function to reverse proxy requests to dev/testing versions of apps
 async function handleTestProxy(req, res) {
   const appId = req.params.appId;
@@ -1089,7 +1123,12 @@ async function handleTestProxy(req, res) {
     const targetPort = urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80);
 
     // Rewrite path: extract everything after '/test/:appId/' using path-to-regexp v8 splat wildcard
-    let targetPath = '/' + (req.params.splat || '');
+    // Note: req.params.splat might be parsed as an array of path segments in some Express versions
+    let pathSuffix = '';
+    if (req.params.splat) {
+      pathSuffix = Array.isArray(req.params.splat) ? req.params.splat.join('/') : req.params.splat;
+    }
+    let targetPath = '/' + pathSuffix;
 
     const connector = http.request({
       host: targetHost,
@@ -1129,6 +1168,41 @@ app.get('/test/:appId', (req, res, next) => {
 // Proxy test versions
 app.all('/test/:appId/{*splat}', handleTestProxy);
 
+// Proxy coordinator API requests to the game coordinator
+app.all('/api/coordinator/{*splat}', (req, res) => {
+  let pathSuffix = '';
+  if (req.params.splat) {
+    pathSuffix = Array.isArray(req.params.splat) ? req.params.splat.join('/') : req.params.splat;
+  }
+  let targetPath = '/api/' + pathSuffix;
+  
+  // Keep query parameters
+  const query = req.url.split('?')[1];
+  if (query) {
+    targetPath += '?' + query;
+  }
+
+  const connector = http.request({
+    host: 'localhost',
+    port: 29009,
+    path: targetPath,
+    method: req.method,
+    headers: req.headers
+  }, (connectorRes) => {
+    res.writeHead(connectorRes.statusCode, connectorRes.headers);
+    connectorRes.pipe(res);
+  });
+
+  req.pipe(connector);
+
+  connector.on('error', (err) => {
+    console.error('[Coordinator Proxy] Error:', err.message);
+    if (!res.headersSent) {
+      res.status(502).send('Bad Gateway');
+    }
+  });
+});
+
 // Serves the client SPA files in production
 app.use(express.static(path.join(__dirname, 'dist')));
 app.get('*splat', (req, res) => {
@@ -1146,6 +1220,10 @@ app.listen(PORT, () => {
 
 if (process.env.FRONTEND_PORT && String(process.env.FRONTEND_PORT) !== String(PORT)) {
   const frontendApp = express();
+  frontendApp.use(cors({
+    origin: true,
+    credentials: true
+  }));
 
   // Redirect /test/:appId to /test/:appId/
   frontendApp.get('/test/:appId', (req, res, next) => {

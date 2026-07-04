@@ -1,5 +1,6 @@
 import { Gamepad2, Search, ExternalLink, Info } from 'lucide-react';
 import type { Game } from '../types';
+import { resolveImageUrl } from '../shared/offlineDb';
 
 export interface StorefrontProps {
   games: Game[];
@@ -39,7 +40,7 @@ export default function Storefront({
       {/* HERO BANNER */}
       {featuredGame && (
         <div className="hero-banner">
-          <img src={featuredGame.cover_image} alt={featuredGame.title} className="hero-image" />
+          <img src={resolveImageUrl(featuredGame.cover_image)} alt={featuredGame.title} className="hero-image" />
           <div className="hero-overlay">
             <span className="hero-badge">Featured Game</span>
             <h1 className="hero-title">{featuredGame.title} Out Now</h1>
@@ -104,7 +105,7 @@ export default function Storefront({
             filteredGames.map(game => (
               <div key={game.id} className="game-card glass-panel glass-panel-interactive">
                 <div className="game-card-img-wrapper">
-                  <img src={game.cover_image || '/starswarm_cover.png'} alt={game.title} className="game-card-img" />
+                  <img src={resolveImageUrl(game.cover_image)} alt={game.title} className="game-card-img" />
                   <span className="game-card-status-badge">
                     {game.icon} Available
                   </span>

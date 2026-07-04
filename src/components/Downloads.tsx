@@ -8,16 +8,26 @@ export default function Downloads() {
   const version = pkg.version;
   const tag = `v${version}`;
 
+  const getDownloadUrl = (urlPath: string) => {
+    if (urlPath.startsWith('http://') || urlPath.startsWith('https://')) {
+      return urlPath;
+    }
+    if (window.location.protocol === 'file:') {
+      return `https://kbs-cloud.com${urlPath}`;
+    }
+    return urlPath;
+  };
+
   const platforms = [
     {
       id: 'windows',
       name: 'Windows Client',
       icon: <Monitor size={36} className="platform-icon windows" />,
       tag: 'Windows 10 / 11 (64-bit)',
-      size: '64.2 MB',
+      size: '93.2 MB',
       version: tag,
       fileName: 'kbs-cloud-hub-setup.exe',
-      downloadUrl: `https://github.com/kbs-cloud/kbs-cloud/releases/download/${tag}/kbs-cloud-hub-setup.exe`,
+      downloadUrl: '/downloads/kbs-cloud-hub-setup.exe',
       instructions: [
         'Download the setup executable.',
         'Double-click kbs-cloud-hub-setup.exe to run the installer.',
@@ -30,14 +40,14 @@ export default function Downloads() {
       name: 'macOS Client',
       icon: <Apple size={36} className="platform-icon macos" />,
       tag: 'macOS 12+ (Universal)',
-      size: '68.5 MB',
+      size: '115.9 MB',
       version: tag,
-      fileName: 'kbs-cloud-hub.dmg',
-      downloadUrl: `https://github.com/kbs-cloud/kbs-cloud/releases/download/${tag}/kbs-cloud-hub.dmg`,
+      fileName: 'kbs-cloud-hub.zip',
+      downloadUrl: '/downloads/kbs-cloud-hub.zip',
       instructions: [
-        'Download the Apple disk image (.dmg).',
-        'Double-click kbs-cloud-hub.dmg to open.',
-        'Drag the KBS Cloud Hub application into your Applications folder.',
+        'Download the macOS application archive (.zip).',
+        'Double-click kbs-cloud-hub.zip to extract the application.',
+        'Drag the extracted KBS Cloud Hub application into your Applications folder.',
         'On first launch, if prompted with an unidentified developer error: Open System Settings > Privacy & Security, scroll down, and click "Open Anyway".'
       ]
     },
@@ -46,10 +56,10 @@ export default function Downloads() {
       name: 'Linux Executable',
       icon: <Terminal size={36} className="platform-icon linux" />,
       tag: 'Ubuntu / Debian / Fedora',
-      size: '70.1 MB',
+      size: '125.2 MB',
       version: tag,
       fileName: 'kbs-cloud-hub.AppImage',
-      downloadUrl: `https://github.com/kbs-cloud/kbs-cloud/releases/download/${tag}/kbs-cloud-hub.AppImage`,
+      downloadUrl: '/downloads/kbs-cloud-hub.AppImage',
       instructions: [
         'Download the .AppImage package.',
         'Open terminal, navigate to download directory, and execute: chmod +x kbs-cloud-hub.AppImage',
@@ -62,10 +72,10 @@ export default function Downloads() {
       name: 'Android Mobile',
       icon: <Smartphone size={36} className="platform-icon android" />,
       tag: 'Android 9.0+',
-      size: '18.4 MB',
+      size: '9.9 MB',
       version: tag,
       fileName: 'kbs-cloud-hub.apk',
-      downloadUrl: `https://github.com/kbs-cloud/kbs-cloud/releases/download/${tag}/kbs-cloud-hub.apk`,
+      downloadUrl: '/downloads/kbs-cloud-hub.apk',
       instructions: [
         'Download the android package (.apk) directly to your device.',
         'If prompted by your browser, enable "Install from Unknown Sources".',
@@ -145,7 +155,7 @@ export default function Downloads() {
             </div>
 
             <a 
-              href={platform.downloadUrl} 
+              href={getDownloadUrl(platform.downloadUrl)} 
               target="_blank" 
               rel="noreferrer" 
               className="btn btn-primary btn-sm"

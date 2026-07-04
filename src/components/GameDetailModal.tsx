@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, ExternalLink, Download, Cpu, Award } from 'lucide-react';
 import type { Game, Achievement, UserProfile } from '../types';
+import { resolveImageUrl } from '../shared/offlineDb';
 
 export interface GameDetailModalProps {
   game: Game;
@@ -63,7 +64,7 @@ export default function GameDetailModal({
         </button>
 
         <div className="game-detail-hero">
-          <img src={game.cover_image || '/starswarm_cover.png'} alt={game.title} className="game-detail-hero-img" />
+          <img src={resolveImageUrl(game.cover_image)} alt={game.title} className="game-detail-hero-img" />
           <div className="game-detail-hero-overlay">
             <h2 style={{ fontSize: '2.2rem', color: '#fff', marginBottom: '4px' }}>
               {game.icon} {game.title}

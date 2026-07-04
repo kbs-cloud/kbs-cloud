@@ -1,5 +1,6 @@
 import { FlaskConical, Search } from 'lucide-react';
 import type { Game } from '../types';
+import { resolveImageUrl } from '../shared/offlineDb';
 
 export interface TestCatalogProps {
   games: Game[];
@@ -93,7 +94,7 @@ export default function TestCatalog({
             filteredGames.map(game => (
               <div key={game.id} className="game-card glass-panel glass-panel-interactive" style={{ borderTop: '2px solid rgba(249, 115, 22, 0.4)' }}>
                 <div className="game-card-img-wrapper">
-                  <img src={game.cover_image || '/starswarm_cover.png'} alt={game.title} className="game-card-img" />
+                  <img src={resolveImageUrl(game.cover_image)} alt={game.title} className="game-card-img" />
                   <span className="game-card-status-badge" style={{ background: 'rgba(249, 115, 22, 0.2)', border: '1px solid rgba(249, 115, 22, 0.4)', color: 'var(--orange)' }}>
                     🧪 Testing Build
                   </span>

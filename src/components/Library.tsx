@@ -1,5 +1,6 @@
 import { Layers, User } from 'lucide-react';
 import type { UserProfile, Game } from '../types';
+import { resolveImageUrl } from '../shared/offlineDb';
 
 export interface LibraryProps {
   user: UserProfile | null;
@@ -41,7 +42,7 @@ export default function Library({
             {games.map(game => (
               <div key={game.id} className="library-card glass-panel">
                 <img 
-                  src={game.cover_image || '/starswarm_cover.png'} 
+                  src={resolveImageUrl(game.cover_image)} 
                   alt={game.title} 
                   className="library-card-bg"
                 />
