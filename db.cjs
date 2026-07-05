@@ -422,7 +422,7 @@ async function seedDefaultApps() {
     prod_url: 'http://localhost:28008',
     dev_url: 'http://localhost:28008',
     github_url: 'https://github.com/kbs-cloud/glimmerwood',
-    download_url: 'https://github.com/gemini/cglib/releases',
+    download_url: 'https://github.com/kbs-cloud/glimmerwood/releases',
     cover_image: '/glimmerwood_cover.png',
     icon: '⚔️',
     isOnline: true,
