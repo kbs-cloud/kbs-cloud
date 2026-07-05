@@ -3,6 +3,16 @@ import { X, ExternalLink, Download, Cpu, Award } from 'lucide-react';
 import type { Game, Achievement, UserProfile } from '../types';
 import { resolveImageUrl } from '../shared/offlineDb';
 
+const resolveDownloadUrl = (urlPath: string) => {
+  if (urlPath.startsWith('http://') || urlPath.startsWith('https://')) {
+    return urlPath;
+  }
+  if (window.location.protocol === 'file:') {
+    return `https://kbs-cloud.com${urlPath}`;
+  }
+  return urlPath;
+};
+
 export interface GameDetailModalProps {
   game: Game;
   onClose: () => void;
@@ -81,39 +91,52 @@ export default function GameDetailModal({
 
         <div className="game-detail-body">
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
-            {installed ? (
+            {game.id === 'glimmerwood' ? (
               <>
-                {isOffline && game.isOnline ? (
-                  <button className="btn btn-secondary" disabled title="Requires active internet connection to authenticate.">
-                    Online Only (Locked Offline)
-                  </button>
-                ) : (
-                  <a href={getLaunchUrl(game)} target="_blank" rel="noreferrer" className="btn btn-primary">
-                    Launch Game {isOffline ? '(Offline)' : ''} <ExternalLink size={16} />
-                  </a>
-                )}
-                
-                <button className="btn btn-secondary text-danger" onClick={handleUninstall}>
-                  Uninstall
-                </button>
+                <a href={resolveDownloadUrl('/downloads/glimmerwood-client-win-x64.zip')} target="_blank" rel="noreferrer" className="btn btn-primary">
+                  <Download size={16} /> PC Build (Windows)
+                </a>
+                <a href={resolveDownloadUrl('/downloads/glimmerwood-client-linux-x64.zip')} target="_blank" rel="noreferrer" className="btn btn-secondary">
+                  <Download size={16} /> Linux Build
+                </a>
               </>
             ) : (
-              <button 
-                className="btn btn-primary" 
-                onClick={handleInstallSim} 
-                disabled={isInstalling || (isOffline && !game.download_url)}
-              >
-                {isInstalling ? (
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: '2px solid #fff', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />
-                    Installing...
-                  </span>
-                ) : (
+              <>
+                {installed ? (
                   <>
-                    <Download size={16} /> Install Game
+                    {isOffline && game.isOnline ? (
+                      <button className="btn btn-secondary" disabled title="Requires active internet connection to authenticate.">
+                        Online Only (Locked Offline)
+                      </button>
+                    ) : (
+                      <a href={getLaunchUrl(game)} target="_blank" rel="noreferrer" className="btn btn-primary">
+                        Launch Game {isOffline ? '(Offline)' : ''} <ExternalLink size={16} />
+                      </a>
+                    )}
+                    
+                    <button className="btn btn-secondary text-danger" onClick={handleUninstall}>
+                      Uninstall
+                    </button>
                   </>
+                ) : (
+                  <button 
+                    className="btn btn-primary" 
+                    onClick={handleInstallSim} 
+                    disabled={isInstalling || (isOffline && !game.download_url)}
+                  >
+                    {isInstalling ? (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: '2px solid #fff', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />
+                        Installing...
+                      </span>
+                    ) : (
+                      <>
+                        <Download size={16} /> Install Game
+                      </>
+                    )}
+                  </button>
                 )}
-              </button>
+              </>
             )}
 
             {/* External GitHub Link */}
@@ -124,7 +147,7 @@ export default function GameDetailModal({
             )}
 
             {/* Download URL for offline version */}
-            {game.download_url && (
+            {game.id !== 'glimmerwood' && game.download_url && (
               <a href={game.download_url} target="_blank" rel="noreferrer" className="btn btn-secondary">
                 <Download size={16} /> Standalone Package
               </a>

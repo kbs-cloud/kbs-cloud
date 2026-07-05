@@ -149,6 +149,9 @@ async function initDatabase() {
     // Ensure dev_url entries are updated to new target ports for testing
     await dbRun("UPDATE apps SET dev_url = 'http://localhost:28002' WHERE id = 'starswarm' AND dev_url != 'http://localhost:28002'");
     await dbRun("UPDATE apps SET dev_url = 'http://localhost:28003' WHERE id = 'tickerclash' AND dev_url != 'http://localhost:28003'");
+    await dbRun("UPDATE apps SET prod_url = 'https://alchemy.kbs-cloud.com' WHERE id = 'alchemists-crucible' AND prod_url != 'https://alchemy.kbs-cloud.com'");
+    await dbRun("UPDATE apps SET cover_image = '/glimmerwood_cover.png' WHERE id = 'glimmerwood' AND cover_image != '/glimmerwood_cover.png'");
+    await dbRun("UPDATE apps SET github_url = 'https://github.com/kbs-cloud/glimmerwood' WHERE id = 'glimmerwood' AND github_url != 'https://github.com/kbs-cloud/glimmerwood'");
   } catch (error) {
     console.error('Database initialization failed:', error);
   }
@@ -283,7 +286,7 @@ async function seedDefaultApps() {
       graphics: 'Integrated Graphics',
       storage: '100 MB available space'
     },
-    prod_url: 'https://alchemists-crucible.kbs-cloud.com',
+    prod_url: 'https://alchemy.kbs-cloud.com',
     dev_url: 'http://localhost:28004',
     github_url: 'https://github.com/kbs-cloud/alchemists-crucible',
     download_url: 'https://github.com/kbs-cloud/alchemists-crucible/releases',
@@ -418,9 +421,9 @@ async function seedDefaultApps() {
     },
     prod_url: 'http://localhost:28008',
     dev_url: 'http://localhost:28008',
-    github_url: 'https://github.com/gemini/cglib',
+    github_url: 'https://github.com/kbs-cloud/glimmerwood',
     download_url: 'https://github.com/gemini/cglib/releases',
-    cover_image: '/cglib_cover.png',
+    cover_image: '/glimmerwood_cover.png',
     icon: '⚔️',
     isOnline: true,
     isMultiplayer: false,

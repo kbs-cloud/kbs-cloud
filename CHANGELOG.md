@@ -1,3 +1,15 @@
+## [0.6.1-alpha.5] - 2026-07-04
+
+## New Features
+
+- **Glimmerwood Non-Web Support**: Handled Glimmerwood as a non-web game in the hub. Clicking "Install" now redirects to its details section, preventing "Launch Game" buttons from showing since it is a standalone client game.
+- **Direct PC/Linux Builds**: Added direct download links for the PC (Windows) and Linux builds of Glimmerwood.
+
+## Bug Fixes
+
+- **Catalog Restore Hang**: Fixed an issue where restoring the minimized browser window caused the game catalog database loading to hang indefinitely.
+- **Crucible Database Link**: Updated the production database URL for Alchemist's Crucible to `https://alchemy.kbs-cloud.com`.
+
 ## [0.6.1-alpha.4] - 2026-06-24
 
 # Next Changelog

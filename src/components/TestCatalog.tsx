@@ -119,7 +119,15 @@ export default function TestCatalog({
                         Info
                       </button>
                       
-                      {installedApps.includes(game.id) ? (
+                      {game.id === 'glimmerwood' ? (
+                        <button 
+                          className="btn btn-sm" 
+                          style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid var(--border-glass)', color: '#fff' }}
+                          onClick={() => setSelectedGame(game)}
+                        >
+                          Install
+                        </button>
+                      ) : installedApps.includes(game.id) ? (
                         isOffline && game.isOnline ? (
                           <button className="btn btn-secondary btn-sm" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }} title="Requires active internet connection.">
                             Locked

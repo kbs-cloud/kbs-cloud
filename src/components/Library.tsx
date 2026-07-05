@@ -58,7 +58,14 @@ export default function Library({
                   </div>
 
                   <div className="library-card-actions">
-                    {installedApps.includes(game.id) ? (
+                    {game.id === 'glimmerwood' ? (
+                      <button 
+                        className="btn btn-primary btn-sm launch-btn"
+                        onClick={() => setSelectedGame(game)}
+                      >
+                        Install Game
+                      </button>
+                    ) : installedApps.includes(game.id) ? (
                       isOffline && game.isOnline ? (
                         <button className="btn btn-secondary btn-sm launch-btn" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }} title="Requires active internet connection.">
                           Locked Offline

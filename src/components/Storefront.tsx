@@ -48,9 +48,15 @@ export default function Storefront({
               {featuredGame.description}
             </p>
             <div style={{ display: 'flex', gap: '12px' }}>
-              <a href={getLaunchUrl(featuredGame)} target="_blank" rel="noreferrer" className="btn btn-primary">
-                Play Now <ExternalLink size={16} />
-              </a>
+              {featuredGame.id === 'glimmerwood' ? (
+                <button className="btn btn-primary" onClick={() => setSelectedGame(featuredGame)}>
+                  Install Now
+                </button>
+              ) : (
+                <a href={getLaunchUrl(featuredGame)} target="_blank" rel="noreferrer" className="btn btn-primary">
+                  Play Now <ExternalLink size={16} />
+                </a>
+              )}
               <button className="btn btn-secondary" onClick={() => setSelectedGame(featuredGame)}>
                 <Info size={16} /> Details
               </button>
@@ -130,7 +136,14 @@ export default function Storefront({
                         Info
                       </button>
                       
-                      {installedApps.includes(game.id) ? (
+                      {game.id === 'glimmerwood' ? (
+                        <button 
+                          className="btn btn-primary btn-sm" 
+                          onClick={() => setSelectedGame(game)}
+                        >
+                          Install
+                        </button>
+                      ) : installedApps.includes(game.id) ? (
                         isOffline && game.isOnline ? (
                           <button className="btn btn-secondary btn-sm" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }} title="Requires active internet connection.">
                             Locked

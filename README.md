@@ -4,7 +4,7 @@ KBS Cloud Hub is the central portal for kbs-cloud.com, providing a responsive sc
 
 ## Features
 
-- **Central Dashboard:** Discover, learn about, and launch sci-fi & strategy games.
+- **Central Dashboard:** Discover, learn about, and launch sci-fi & strategy games (with support for standalone/non-web client downloads).
 - **SSO Authentication:** Sign in securely via KBS Auth SSO.
 - **Responsive Design:** Mobile-first sci-fi glassmorphic UI.
 - **Dual-Port Serving:** Custom static and API proxying architecture.

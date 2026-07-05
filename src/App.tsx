@@ -97,7 +97,7 @@ export default function App() {
   };
 
   const fetchAppsList = () => {
-    setTimeout(() => setLoadingGames(true), 0);
+    setLoadingGames(true);
     if (OfflineManager.isOffline()) {
       const cached = OfflineManager.getGamesCache();
       setGames(cached);
