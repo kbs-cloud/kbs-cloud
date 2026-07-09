@@ -30,6 +30,14 @@ export interface Game {
   dev_url: string;
   github_url: string;
   download_url: string;
+  website?: string;
+  build_urls?: {
+    [key: string]: {
+      url: string;
+      status: 'active' | 'inactive' | 'maintenance' | 'deprecated' | 'unsupported';
+      error_message: string;
+    };
+  };
   cover_image: string;
   icon: string;
   isOnline: boolean;

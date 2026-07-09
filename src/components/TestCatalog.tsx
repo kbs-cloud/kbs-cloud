@@ -119,7 +119,7 @@ export default function TestCatalog({
                         Info
                       </button>
                       
-                      {game.id === 'glimmerwood' ? (
+                      {!game.prod_url || game.prod_url.trim() === '' ? (
                         <button 
                           className="btn btn-sm" 
                           style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid var(--border-glass)', color: '#fff' }}

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
-import { Key, Plus, ArrowLeft, Check, Copy, Shield, Users, Trash, UserPlus, Award } from 'lucide-react';
+import { Key, Plus, ArrowLeft, Check, Copy, Shield, Users, Trash, UserPlus, Award, Monitor, Laptop, Smartphone, Terminal } from 'lucide-react';
 import type { Game, Achievement, UserProfile } from '../types';
+import { resolveImageUrl } from '../shared/offlineDb';
 
 export interface DevPortalProps {
   user: UserProfile;
@@ -71,6 +72,31 @@ export default function DevPortal({
   const [formIcon, setFormIcon] = useState('');
   const [formIsOnline, setFormIsOnline] = useState(true);
   const [formIsMultiplayer, setFormIsMultiplayer] = useState(true);
+  const [formWebsite, setFormWebsite] = useState('');
+  const [formIsWebGame, setFormIsWebGame] = useState(true);
+
+  const [formBuildWindowsUrl, setFormBuildWindowsUrl] = useState('');
+  const [formBuildWindowsStatus, setFormBuildWindowsStatus] = useState('inactive');
+  const [formBuildWindowsError, setFormBuildWindowsError] = useState('');
+
+  const [formBuildLinuxUrl, setFormBuildLinuxUrl] = useState('');
+  const [formBuildLinuxStatus, setFormBuildLinuxStatus] = useState('inactive');
+  const [formBuildLinuxError, setFormBuildLinuxError] = useState('');
+
+  const [formBuildMacosUrl, setFormBuildMacosUrl] = useState('');
+  const [formBuildMacosStatus, setFormBuildMacosStatus] = useState('inactive');
+  const [formBuildMacosError, setFormBuildMacosError] = useState('');
+
+  const [formBuildAndroidUrl, setFormBuildAndroidUrl] = useState('');
+  const [formBuildAndroidStatus, setFormBuildAndroidStatus] = useState('inactive');
+  const [formBuildAndroidError, setFormBuildAndroidError] = useState('');
+
+  const [formBuildIosUrl, setFormBuildIosUrl] = useState('');
+  const [formBuildIosStatus, setFormBuildIosStatus] = useState('inactive');
+  const [formBuildIosError, setFormBuildIosError] = useState('');
+
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Achievement Form States
   const [achId, setAchId] = useState('');
@@ -78,6 +104,63 @@ export default function DevPortal({
   const [achDesc, setAchDesc] = useState('');
   const [achIcon, setAchIcon] = useState('🏆');
   const [achXpValue, setAchXpValue] = useState(100);
+
+  const uploadFile = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      showToastMsg('Only image files are supported.', 'error');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToastMsg('Image size must be less than 5MB.', 'error');
+      return;
+    }
+
+    setUploadingImage(true);
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64Data = reader.result as string;
+      try {
+        const res = await fetch('/api/developer/upload-cover', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileName: file.name,
+            fileData: base64Data
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setFormCoverImage(data.url);
+          showToastMsg('Cover image uploaded successfully!', 'success');
+        } else {
+          showToastMsg(data.error || 'Failed to upload cover image.', 'error');
+        }
+      } catch (err) {
+        showToastMsg('Error uploading image.', 'error');
+      } finally {
+        setUploadingImage(false);
+      }
+    };
+    reader.onerror = () => {
+      showToastMsg('Failed to read file.', 'error');
+      setUploadingImage(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      uploadFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      uploadFile(e.target.files[0]);
+    }
+  };
 
   const fetchDevAppsList = () => {
     fetch('/api/developer/apps')
@@ -301,6 +384,23 @@ export default function DevPortal({
     setFormIcon('');
     setFormIsOnline(true);
     setFormIsMultiplayer(true);
+    setFormWebsite('');
+    setFormIsWebGame(true);
+    setFormBuildWindowsUrl('');
+    setFormBuildWindowsStatus('inactive');
+    setFormBuildWindowsError('');
+    setFormBuildLinuxUrl('');
+    setFormBuildLinuxStatus('inactive');
+    setFormBuildLinuxError('');
+    setFormBuildMacosUrl('');
+    setFormBuildMacosStatus('inactive');
+    setFormBuildMacosError('');
+    setFormBuildAndroidUrl('');
+    setFormBuildAndroidStatus('inactive');
+    setFormBuildAndroidError('');
+    setFormBuildIosUrl('');
+    setFormBuildIosStatus('inactive');
+    setFormBuildIosError('');
   };
 
   const loadAppFormForEdit = (game: Game) => {
@@ -327,6 +427,35 @@ export default function DevPortal({
     setFormIcon(game.icon || '');
     setFormIsOnline(game.isOnline);
     setFormIsMultiplayer(game.isMultiplayer);
+    setFormWebsite(game.website || '');
+    const isWeb = !!(game.prod_url && game.prod_url.trim() !== '');
+    setFormIsWebGame(isWeb);
+
+    const bWindows = game.build_urls?.windows || { url: '', status: 'inactive', error_message: '' };
+    setFormBuildWindowsUrl(bWindows.url || '');
+    setFormBuildWindowsStatus(bWindows.status || 'inactive');
+    setFormBuildWindowsError(bWindows.error_message || '');
+
+    const bLinux = game.build_urls?.linux || { url: '', status: 'inactive', error_message: '' };
+    setFormBuildLinuxUrl(bLinux.url || '');
+    setFormBuildLinuxStatus(bLinux.status || 'inactive');
+    setFormBuildLinuxError(bLinux.error_message || '');
+
+    const bMacos = game.build_urls?.macos || { url: '', status: 'inactive', error_message: '' };
+    setFormBuildMacosUrl(bMacos.url || '');
+    setFormBuildMacosStatus(bMacos.status || 'inactive');
+    setFormBuildMacosError(bMacos.error_message || '');
+
+    const bAndroid = game.build_urls?.android || { url: '', status: 'inactive', error_message: '' };
+    setFormBuildAndroidUrl(bAndroid.url || '');
+    setFormBuildAndroidStatus(bAndroid.status || 'inactive');
+    setFormBuildAndroidError(bAndroid.error_message || '');
+
+    const bIos = game.build_urls?.ios || { url: '', status: 'inactive', error_message: '' };
+    setFormBuildIosUrl(bIos.url || '');
+    setFormBuildIosStatus(bIos.status || 'inactive');
+    setFormBuildIosError(bIos.error_message || '');
+
     setIsAddingApp(false);
   };
 
@@ -340,6 +469,17 @@ export default function DevPortal({
       memory: formMemory,
       graphics: formGraphics,
       storage: formStorage
+    };
+
+    const prodUrl = formIsWebGame ? formProdUrl.trim() : '';
+    const devUrl = formIsWebGame ? formDevUrl.trim() : '';
+    const website = formWebsite.trim();
+    const buildUrls = {
+      windows: { url: formBuildWindowsUrl.trim(), status: formBuildWindowsStatus, error_message: formBuildWindowsError.trim() },
+      linux: { url: formBuildLinuxUrl.trim(), status: formBuildLinuxStatus, error_message: formBuildLinuxError.trim() },
+      macos: { url: formBuildMacosUrl.trim(), status: formBuildMacosStatus, error_message: formBuildMacosError.trim() },
+      android: { url: formBuildAndroidUrl.trim(), status: formBuildAndroidStatus, error_message: formBuildAndroidError.trim() },
+      ios: { url: formBuildIosUrl.trim(), status: formBuildIosStatus, error_message: formBuildIosError.trim() }
     };
 
     try {
@@ -357,14 +497,16 @@ export default function DevPortal({
           tags,
           features,
           systemRequirements,
-          prodUrl: formProdUrl,
-          devUrl: formDevUrl,
+          prodUrl,
+          devUrl,
           githubUrl: formGithubUrl,
           downloadUrl: formDownloadUrl,
           coverImage: formCoverImage,
           icon: formIcon,
           isOnline: formIsOnline,
-          isMultiplayer: formIsMultiplayer
+          isMultiplayer: formIsMultiplayer,
+          website,
+          buildUrls
         })
       });
       const data = await res.json();
@@ -396,6 +538,17 @@ export default function DevPortal({
       storage: formStorage
     };
 
+    const prodUrl = formIsWebGame ? formProdUrl.trim() : '';
+    const devUrl = formIsWebGame ? formDevUrl.trim() : '';
+    const website = formWebsite.trim();
+    const buildUrls = {
+      windows: { url: formBuildWindowsUrl.trim(), status: formBuildWindowsStatus, error_message: formBuildWindowsError.trim() },
+      linux: { url: formBuildLinuxUrl.trim(), status: formBuildLinuxStatus, error_message: formBuildLinuxError.trim() },
+      macos: { url: formBuildMacosUrl.trim(), status: formBuildMacosStatus, error_message: formBuildMacosError.trim() },
+      android: { url: formBuildAndroidUrl.trim(), status: formBuildAndroidStatus, error_message: formBuildAndroidError.trim() },
+      ios: { url: formBuildIosUrl.trim(), status: formBuildIosStatus, error_message: formBuildIosError.trim() }
+    };
+
     try {
       const res = await fetch(`/api/developer/apps/${editingApp.id}`, {
         method: 'PUT',
@@ -410,14 +563,16 @@ export default function DevPortal({
           tags,
           features,
           systemRequirements,
-          prodUrl: formProdUrl,
-          devUrl: formDevUrl,
+          prodUrl,
+          devUrl,
           githubUrl: formGithubUrl,
           downloadUrl: formDownloadUrl,
           coverImage: formCoverImage,
           icon: formIcon,
           isOnline: formIsOnline,
-          isMultiplayer: formIsMultiplayer
+          isMultiplayer: formIsMultiplayer,
+          website,
+          buildUrls
         })
       });
       const data = await res.json();
@@ -1205,11 +1360,75 @@ export default function DevPortal({
                 </div>
                 <div style={{ flex: 2 }}>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
-                    Cover Image URL
+                    Cover Image
                   </label>
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    {/* Preview box */}
+                    <div style={{
+                      width: '64px',
+                      height: '42px',
+                      borderRadius: '6px',
+                      border: '1px solid var(--border-glass)',
+                      background: 'rgba(0,0,0,0.4)',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}>
+                      {formCoverImage ? (
+                        <img 
+                          src={resolveImageUrl(formCoverImage)} 
+                          alt="Preview" 
+                          style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                        />
+                      ) : (
+                        <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>None</span>
+                      )}
+                    </div>
+                    {/* Drag-and-drop file upload zone */}
+                    <div 
+                      onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                      onDragLeave={() => setIsDragging(false)}
+                      onDrop={handleDrop}
+                      onClick={() => document.getElementById('cover-file-input')?.click()}
+                      style={{
+                        flex: 1,
+                        height: '42px',
+                        border: isDragging ? '1.5px dashed var(--cyan)' : '1px dashed var(--border-glass)',
+                        borderRadius: '6px',
+                        background: isDragging ? 'rgba(0, 255, 255, 0.05)' : 'rgba(255,255,255,0.02)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'var(--transition-smooth)',
+                        padding: '4px 8px'
+                      }}
+                    >
+                      {uploadingImage ? (
+                        <span style={{ fontSize: '0.75rem', color: 'var(--cyan)' }}>Uploading...</span>
+                      ) : (
+                        <>
+                          <span style={{ fontSize: '0.75rem', color: '#fff', fontWeight: 500 }}>
+                            Drag & drop or click to upload cover image
+                          </span>
+                        </>
+                      )}
+                      <input 
+                        id="cover-file-input" 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleFileChange} 
+                        style={{ display: 'none' }} 
+                      />
+                    </div>
+                  </div>
+                  {/* Text input for manual URL */}
                   <input 
                     type="text" 
-                    placeholder="/starswarm_cover.png" 
+                    placeholder="/starswarm_cover.png or upload above" 
                     value={formCoverImage}
                     onChange={(e) => setFormCoverImage(e.target.value)}
                     style={{
@@ -1217,9 +1436,11 @@ export default function DevPortal({
                       background: 'rgba(0,0,0,0.4)',
                       border: '1px solid var(--border-glass)',
                       borderRadius: '8px',
-                      padding: '10px 14px',
+                      padding: '8px 12px',
                       color: '#fff',
-                      outline: 'none'
+                      outline: 'none',
+                      marginTop: '6px',
+                      fontSize: '0.8rem'
                     }}
                   />
                 </div>
@@ -1314,88 +1535,256 @@ export default function DevPortal({
               </div>
             </div>
 
-            {/* Network URLs & Github */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
-                  Production URL
-                </label>
-                <input 
-                  type="url" 
-                  placeholder="https://game.kbs-cloud.com" 
-                  value={formProdUrl}
-                  onChange={(e) => setFormProdUrl(e.target.value)}
-                  style={{
-                    width: '100%',
-                    background: 'rgba(0,0,0,0.4)',
-                    border: '1px solid var(--border-glass)',
-                    borderRadius: '8px',
-                    padding: '10px 14px',
-                    color: '#fff',
-                    outline: 'none'
-                  }}
-                />
+            {/* Game Type, Website & Links */}
+            <div style={{
+              background: 'rgba(255,255,255,0.01)',
+              border: '1px solid var(--border-glass)',
+              borderRadius: '8px',
+              padding: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              marginTop: '8px'
+            }}>
+              <h4 style={{ color: '#fff', fontSize: '0.95rem', margin: 0, borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '8px' }}>
+                Game Deployment & Links
+              </h4>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                    Game Type / Platform Type
+                  </label>
+                  <select
+                    value={formIsWebGame ? 'web' : 'native'}
+                    onChange={(e) => setFormIsWebGame(e.target.value === 'web')}
+                    style={{
+                      width: '100%',
+                      background: 'rgba(0,0,0,0.4)',
+                      border: '1px solid var(--border-glass)',
+                      borderRadius: '8px',
+                      padding: '10px 14px',
+                      color: '#fff',
+                      outline: 'none'
+                    }}
+                  >
+                    <option value="web">Web Playable (Runs inside browser frame)</option>
+                    <option value="native">Native / Downloadable (Runs as native binary build)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                    Website URL
+                  </label>
+                  <input 
+                    type="url" 
+                    placeholder="https://mygame.com" 
+                    value={formWebsite}
+                    onChange={(e) => setFormWebsite(e.target.value)}
+                    style={{
+                      width: '100%',
+                      background: 'rgba(0,0,0,0.4)',
+                      border: '1px solid var(--border-glass)',
+                      borderRadius: '8px',
+                      padding: '10px 14px',
+                      color: '#fff',
+                      outline: 'none'
+                    }}
+                  />
+                </div>
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
-                  Development / Local URL
-                </label>
-                <input 
-                  type="text" 
-                  placeholder="http://localhost:3001" 
-                  value={formDevUrl}
-                  onChange={(e) => setFormDevUrl(e.target.value)}
-                  style={{
-                    width: '100%',
-                    background: 'rgba(0,0,0,0.4)',
-                    border: '1px solid var(--border-glass)',
-                    borderRadius: '8px',
-                    padding: '10px 14px',
-                    color: '#fff',
-                    outline: 'none'
-                  }}
-                />
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: formIsWebGame ? 'var(--text-muted)' : 'rgba(255,255,255,0.15)', marginBottom: '4px' }}>
+                    Production URL {!formIsWebGame && '(Not applicable for Native)'}
+                  </label>
+                  <input 
+                    type="url" 
+                    placeholder="https://game.kbs-cloud.com" 
+                    value={formProdUrl}
+                    onChange={(e) => setFormProdUrl(e.target.value)}
+                    disabled={!formIsWebGame}
+                    style={{
+                      width: '100%',
+                      background: formIsWebGame ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.15)',
+                      border: '1px solid var(--border-glass)',
+                      borderRadius: '8px',
+                      padding: '10px 14px',
+                      color: formIsWebGame ? '#fff' : 'rgba(255,255,255,0.3)',
+                      outline: 'none',
+                      cursor: formIsWebGame ? 'text' : 'not-allowed'
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: formIsWebGame ? 'var(--text-muted)' : 'rgba(255,255,255,0.15)', marginBottom: '4px' }}>
+                    Development / Local URL {!formIsWebGame && '(Not applicable for Native)'}
+                  </label>
+                  <input 
+                    type="text" 
+                    placeholder="http://localhost:3001" 
+                    value={formDevUrl}
+                    onChange={(e) => setFormDevUrl(e.target.value)}
+                    disabled={!formIsWebGame}
+                    style={{
+                      width: '100%',
+                      background: formIsWebGame ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.15)',
+                      border: '1px solid var(--border-glass)',
+                      borderRadius: '8px',
+                      padding: '10px 14px',
+                      color: formIsWebGame ? '#fff' : 'rgba(255,255,255,0.3)',
+                      outline: 'none',
+                      cursor: formIsWebGame ? 'text' : 'not-allowed'
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                    GitHub Link
+                  </label>
+                  <input 
+                    type="url" 
+                    placeholder="https://github.com/..." 
+                    value={formGithubUrl}
+                    onChange={(e) => setFormGithubUrl(e.target.value)}
+                    style={{
+                      width: '100%',
+                      background: 'rgba(0,0,0,0.4)',
+                      border: '1px solid var(--border-glass)',
+                      borderRadius: '8px',
+                      padding: '10px 14px',
+                      color: '#fff',
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                    Release Page / Download Page
+                  </label>
+                  <input 
+                    type="url" 
+                    placeholder="https://..." 
+                    value={formDownloadUrl}
+                    onChange={(e) => setFormDownloadUrl(e.target.value)}
+                    style={{
+                      width: '100%',
+                      background: 'rgba(0,0,0,0.4)',
+                      border: '1px solid var(--border-glass)',
+                      borderRadius: '8px',
+                      padding: '10px 14px',
+                      color: '#fff',
+                      outline: 'none'
+                    }}
+                  />
+                </div>
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
-                  GitHub Link
-                </label>
-                <input 
-                  type="url" 
-                  placeholder="https://github.com/..." 
-                  value={formGithubUrl}
-                  onChange={(e) => setFormGithubUrl(e.target.value)}
-                  style={{
-                    width: '100%',
-                    background: 'rgba(0,0,0,0.4)',
-                    border: '1px solid var(--border-glass)',
-                    borderRadius: '8px',
-                    padding: '10px 14px',
-                    color: '#fff',
-                    outline: 'none'
-                  }}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
-                  Offline Download Page
-                </label>
-                <input 
-                  type="url" 
-                  placeholder="https://..." 
-                  value={formDownloadUrl}
-                  onChange={(e) => setFormDownloadUrl(e.target.value)}
-                  style={{
-                    width: '100%',
-                    background: 'rgba(0,0,0,0.4)',
-                    border: '1px solid var(--border-glass)',
-                    borderRadius: '8px',
-                    padding: '10px 14px',
-                    color: '#fff',
-                    outline: 'none'
-                  }}
-                />
-              </div>
+            </div>
+
+            {/* OS Build Downloads Configuration */}
+            <div style={{
+              background: 'rgba(255,255,255,0.01)',
+              border: '1px solid var(--border-glass)',
+              borderRadius: '8px',
+              padding: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px'
+            }}>
+              <h4 style={{ color: '#fff', fontSize: '0.95rem', margin: 0, borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '8px' }}>
+                Operating System Build Downloads
+              </h4>
+              
+              {[
+                { id: 'windows', name: 'Windows Build', icon: <Monitor size={14} />, url: formBuildWindowsUrl, setUrl: setFormBuildWindowsUrl, status: formBuildWindowsStatus, setStatus: setFormBuildWindowsStatus, err: formBuildWindowsError, setErr: setFormBuildWindowsError },
+                { id: 'linux', name: 'Linux Build', icon: <Terminal size={14} />, url: formBuildLinuxUrl, setUrl: setFormBuildLinuxUrl, status: formBuildLinuxStatus, setStatus: setFormBuildLinuxStatus, err: formBuildLinuxError, setErr: setFormBuildLinuxError },
+                { id: 'macos', name: 'macOS Build', icon: <Laptop size={14} />, url: formBuildMacosUrl, setUrl: setFormBuildMacosUrl, status: formBuildMacosStatus, setStatus: setFormBuildMacosStatus, err: formBuildMacosError, setErr: setFormBuildMacosError },
+                { id: 'android', name: 'Android Build', icon: <Smartphone size={14} />, url: formBuildAndroidUrl, setUrl: setFormBuildAndroidUrl, status: formBuildAndroidStatus, setStatus: setFormBuildAndroidStatus, err: formBuildAndroidError, setErr: setFormBuildAndroidError },
+                { id: 'ios', name: 'iOS Build', icon: <Smartphone size={14} />, url: formBuildIosUrl, setUrl: setFormBuildIosUrl, status: formBuildIosStatus, setStatus: setFormBuildIosStatus, err: formBuildIosError, setErr: setFormBuildIosError },
+              ].map(plat => (
+                <div key={plat.id} style={{
+                  background: 'rgba(0,0,0,0.2)',
+                  border: '1px solid rgba(255,255,255,0.03)',
+                  borderRadius: '6px',
+                  padding: '12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, color: '#fff', fontSize: '0.85rem' }}>
+                      <span style={{ color: 'var(--cyan)' }}>{plat.icon}</span>
+                      {plat.name}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Status:</span>
+                      <select
+                        value={plat.status}
+                        onChange={(e) => plat.setStatus(e.target.value)}
+                        style={{
+                          background: 'rgba(0,0,0,0.5)',
+                          border: '1px solid var(--border-glass)',
+                          borderRadius: '4px',
+                          color: '#fff',
+                          padding: '4px 8px',
+                          fontSize: '0.75rem',
+                          outline: 'none'
+                        }}
+                      >
+                        <option value="inactive">Inactive / None</option>
+                        <option value="active">Active / Available</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="deprecated">Deprecated</option>
+                        <option value="unsupported">Unsupported</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {plat.status === 'active' && (
+                    <div>
+                      <input 
+                        type="text" 
+                        placeholder="Download URL (e.g. /downloads/game-win.zip or https://...)" 
+                        value={plat.url}
+                        onChange={(e) => plat.setUrl(e.target.value)}
+                        style={{
+                          width: '100%',
+                          background: 'rgba(0,0,0,0.4)',
+                          border: '1px solid var(--border-glass)',
+                          borderRadius: '6px',
+                          padding: '6px 10px',
+                          color: '#fff',
+                          outline: 'none',
+                          fontSize: '0.8rem'
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {plat.status !== 'active' && plat.status !== 'inactive' && (
+                    <div>
+                      <input 
+                        type="text" 
+                        placeholder="Custom warning/error message displayed to users (optional)" 
+                        value={plat.err}
+                        onChange={(e) => plat.setErr(e.target.value)}
+                        style={{
+                          width: '100%',
+                          background: 'rgba(0,0,0,0.4)',
+                          border: '1px solid var(--border-glass)',
+                          borderRadius: '6px',
+                          padding: '6px 10px',
+                          color: '#fff',
+                          outline: 'none',
+                          fontSize: '0.8rem'
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
 
             {/* System Requirements */}

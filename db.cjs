@@ -66,6 +66,8 @@ async function initDatabase() {
         is_online INTEGER DEFAULT 1,
         is_multiplayer INTEGER DEFAULT 1,
         app_token TEXT UNIQUE,
+        website TEXT DEFAULT '',
+        build_urls TEXT DEFAULT '{}',
         created_at TEXT,
         updated_at TEXT
       )
@@ -143,6 +145,18 @@ async function initDatabase() {
 
     console.log('Database schema verified/created successfully.');
 
+    // Ensure columns exist (for migration)
+    try {
+      await dbRun('ALTER TABLE apps ADD COLUMN website TEXT DEFAULT ""');
+    } catch (err) {
+      // column already exists, ignore
+    }
+    try {
+      await dbRun('ALTER TABLE apps ADD COLUMN build_urls TEXT DEFAULT "{}"');
+    } catch (err) {
+      // column already exists, ignore
+    }
+
     // Seed default applications
     await seedDefaultApps();
 
@@ -152,6 +166,19 @@ async function initDatabase() {
     await dbRun("UPDATE apps SET prod_url = 'https://alchemy.kbs-cloud.com' WHERE id = 'alchemists-crucible' AND prod_url != 'https://alchemy.kbs-cloud.com'");
     await dbRun("UPDATE apps SET cover_image = '/glimmerwood_cover.png' WHERE id = 'glimmerwood' AND cover_image != '/glimmerwood_cover.png'");
     await dbRun("UPDATE apps SET github_url = 'https://github.com/kbs-cloud/glimmerwood' WHERE id = 'glimmerwood' AND github_url != 'https://github.com/kbs-cloud/glimmerwood'");
+    
+    // Set Glimmerwood to a native game with website and OS build config
+    const defaultBuilds = {
+      windows: { url: '/downloads/glimmerwood-client-win-x64.zip', status: 'active', error_message: '' },
+      linux: { url: '/downloads/glimmerwood-client-linux-x64.zip', status: 'active', error_message: '' },
+      macos: { url: '', status: 'unsupported', error_message: 'macOS build not currently supported.' },
+      android: { url: '', status: 'maintenance', error_message: 'Android build coming soon.' },
+      ios: { url: '', status: 'inactive', error_message: '' }
+    };
+    await dbRun("UPDATE apps SET prod_url = '', website = ?, build_urls = ? WHERE id = 'glimmerwood'", [
+      'https://glimmerwood.kbs-cloud.com',
+      JSON.stringify(defaultBuilds)
+    ]);
   } catch (error) {
     console.error('Database initialization failed:', error);
   }
@@ -165,8 +192,8 @@ async function seedDefaultApps() {
     const exists = await dbGet('SELECT id FROM apps WHERE id = ?', [appData.id]);
     if (!exists) {
       await dbRun(
-        `INSERT INTO apps (id, title, developer, publisher, release_date, description, full_description, tags, features, system_requirements, prod_url, dev_url, github_url, download_url, cover_image, icon, is_online, is_multiplayer, app_token, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO apps (id, title, developer, publisher, release_date, description, full_description, tags, features, system_requirements, prod_url, dev_url, github_url, download_url, cover_image, icon, is_online, is_multiplayer, app_token, website, build_urls, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           appData.id,
           appData.title,
@@ -187,6 +214,8 @@ async function seedDefaultApps() {
           appData.isOnline ? 1 : 0,
           appData.isMultiplayer ? 1 : 0,
           appData.app_token,
+          appData.website || '',
+          JSON.stringify(appData.build_urls || {}),
           now,
           now
         ]
@@ -419,7 +448,7 @@ async function seedDefaultApps() {
       graphics: 'OpenGL 3.3 compatible GPU',
       storage: '200 MB available space'
     },
-    prod_url: 'http://localhost:28008',
+    prod_url: '',
     dev_url: 'http://localhost:28008',
     github_url: 'https://github.com/kbs-cloud/glimmerwood',
     download_url: 'https://github.com/kbs-cloud/glimmerwood/releases',
@@ -427,7 +456,15 @@ async function seedDefaultApps() {
     icon: '⚔️',
     isOnline: true,
     isMultiplayer: false,
-    app_token: 'glimmerwood_token_dev_555'
+    app_token: 'glimmerwood_token_dev_555',
+    website: 'https://glimmerwood.kbs-cloud.com',
+    build_urls: {
+      windows: { url: '/downloads/glimmerwood-client-win-x64.zip', status: 'active', error_message: '' },
+      linux: { url: '/downloads/glimmerwood-client-linux-x64.zip', status: 'active', error_message: '' },
+      macos: { url: '', status: 'unsupported', error_message: 'macOS build not currently supported.' },
+      android: { url: '', status: 'maintenance', error_message: 'Android build coming soon.' },
+      ios: { url: '', status: 'inactive', error_message: '' }
+    }
   });
 
   // 3. Seed Achievements

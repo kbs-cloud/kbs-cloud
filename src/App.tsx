@@ -500,7 +500,7 @@ export default function App() {
       <main className="content-container">
         {activeTab === 'store' && (
           <Storefront
-            games={games.filter(g => g.prod_url && g.prod_url.trim() !== '')}
+            games={games}
             loadingGames={loadingGames}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
@@ -516,7 +516,7 @@ export default function App() {
         {activeTab === 'library' && (
           <Library
             user={user}
-            games={games.filter(g => g.prod_url && g.prod_url.trim() !== '')}
+            games={games}
             loadingGames={loadingGames}
             setSelectedGame={setSelectedGame}
             getLaunchUrl={getLaunchUrl}

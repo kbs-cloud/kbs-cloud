@@ -48,7 +48,7 @@ export default function Storefront({
               {featuredGame.description}
             </p>
             <div style={{ display: 'flex', gap: '12px' }}>
-              {featuredGame.id === 'glimmerwood' ? (
+              {!featuredGame.prod_url || featuredGame.prod_url.trim() === '' ? (
                 <button className="btn btn-primary" onClick={() => setSelectedGame(featuredGame)}>
                   Install Now
                 </button>
@@ -136,7 +136,7 @@ export default function Storefront({
                         Info
                       </button>
                       
-                      {game.id === 'glimmerwood' ? (
+                      {!game.prod_url || game.prod_url.trim() === '' ? (
                         <button 
                           className="btn btn-primary btn-sm" 
                           onClick={() => setSelectedGame(game)}

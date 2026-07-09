@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
-import { X, ExternalLink, Download, Cpu, Award } from 'lucide-react';
+import { X, ExternalLink, Download, Cpu, Award, Globe, AlertTriangle, Monitor, Laptop, Smartphone, Terminal } from 'lucide-react';
 import type { Game, Achievement, UserProfile } from '../types';
 import { resolveImageUrl } from '../shared/offlineDb';
+
+const OS_PLATFORMS: Record<string, { name: string; icon: React.ReactNode }> = {
+  windows: { name: 'Windows', icon: <Monitor size={16} /> },
+  linux: { name: 'Linux', icon: <Terminal size={16} /> },
+  macos: { name: 'macOS', icon: <Laptop size={16} /> },
+  android: { name: 'Android', icon: <Smartphone size={16} /> },
+  ios: { name: 'iOS', icon: <Smartphone size={16} /> }
+};
 
 const resolveDownloadUrl = (urlPath: string) => {
   if (urlPath.startsWith('http://') || urlPath.startsWith('https://')) {
@@ -91,17 +99,23 @@ export default function GameDetailModal({
 
         <div className="game-detail-body">
           <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
-            {game.id === 'glimmerwood' ? (
+            {!game.prod_url || game.prod_url.trim() === '' ? (
               <>
-                <a href={resolveDownloadUrl('/downloads/glimmerwood-client-win-x64.zip')} target="_blank" rel="noreferrer" className="btn btn-primary">
-                  <Download size={16} /> PC Build (Windows)
-                </a>
-                <a href={resolveDownloadUrl('/downloads/glimmerwood-client-linux-x64.zip')} target="_blank" rel="noreferrer" className="btn btn-secondary">
-                  <Download size={16} /> Linux Build
-                </a>
+                {/* Native Game Main Actions */}
+                {game.website && (
+                  <a href={game.website} target="_blank" rel="noreferrer" className="btn btn-primary">
+                    <Globe size={16} /> Visit Website
+                  </a>
+                )}
+                {game.download_url && (
+                  <a href={game.download_url} target="_blank" rel="noreferrer" className="btn btn-secondary">
+                    <Download size={16} /> Release Page
+                  </a>
+                )}
               </>
             ) : (
               <>
+                {/* Web Game Main Actions */}
                 {installed ? (
                   <>
                     {isOffline && game.isOnline ? (
@@ -136,6 +150,16 @@ export default function GameDetailModal({
                     )}
                   </button>
                 )}
+                {game.website && (
+                  <a href={game.website} target="_blank" rel="noreferrer" className="btn btn-secondary">
+                    <Globe size={16} /> Website
+                  </a>
+                )}
+                {game.download_url && (
+                  <a href={game.download_url} target="_blank" rel="noreferrer" className="btn btn-secondary">
+                    <Download size={16} /> Standalone Package
+                  </a>
+                )}
               </>
             )}
 
@@ -145,19 +169,98 @@ export default function GameDetailModal({
                 <ExternalLink size={16} /> GitHub Codebase
               </a>
             )}
-
-            {/* Download URL for offline version */}
-            {game.id !== 'glimmerwood' && game.download_url && (
-              <a href={game.download_url} target="_blank" rel="noreferrer" className="btn btn-secondary">
-                <Download size={16} /> Standalone Package
-              </a>
-            )}
           </div>
 
           <div className="game-detail-grid">
             <div className="game-detail-main">
               <h3>About the Game</h3>
               <p>{game.full_description || game.description}</p>
+
+              {/* Dynamic OS client builds grid */}
+              {(!game.prod_url || (game.build_urls && Object.values(game.build_urls).some(b => b && b.status !== 'inactive'))) && (
+                <div style={{ marginBottom: '32px', marginTop: '24px' }}>
+                  <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                    <Download size={20} style={{ color: 'var(--cyan)' }} />
+                    Download Client Builds
+                  </h3>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                    gap: '16px'
+                  }}>
+                    {Object.entries(OS_PLATFORMS).map(([key, os]) => {
+                      const build = game.build_urls?.[key];
+                      if (!build || build.status === 'inactive') return null;
+
+                      let statusBadge = null;
+                      let borderStyle = '1px solid rgba(255,255,255,0.06)';
+                      let bgStyle = 'rgba(255,255,255,0.01)';
+                      
+                      if (build.status === 'maintenance') {
+                        statusBadge = <span style={{ fontSize: '0.65rem', background: 'rgba(234, 88, 12, 0.15)', border: '1px solid var(--orange)', color: 'var(--orange)', padding: '1px 5px', borderRadius: '4px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>Maintenance</span>;
+                        borderStyle = '1px solid rgba(234, 88, 12, 0.25)';
+                        bgStyle = 'rgba(234, 88, 12, 0.02)';
+                      } else if (build.status === 'deprecated') {
+                        statusBadge = <span style={{ fontSize: '0.65rem', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid var(--red)', color: 'var(--red)', padding: '1px 5px', borderRadius: '4px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>Deprecated</span>;
+                        borderStyle = '1px solid rgba(239, 68, 68, 0.25)';
+                        bgStyle = 'rgba(239, 68, 68, 0.02)';
+                      } else if (build.status === 'unsupported') {
+                        statusBadge = <span style={{ fontSize: '0.65rem', background: 'rgba(156, 163, 175, 0.15)', border: '1px solid var(--text-muted)', color: 'var(--text-muted)', padding: '1px 5px', borderRadius: '4px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>Unsupported</span>;
+                        borderStyle = '1px solid rgba(156, 163, 175, 0.2)';
+                        bgStyle = 'rgba(156, 163, 175, 0.02)';
+                      } else if (build.status === 'active') {
+                        statusBadge = <span style={{ fontSize: '0.65rem', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid var(--green)', color: 'var(--green)', padding: '1px 5px', borderRadius: '4px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>Available</span>;
+                        borderStyle = '1px solid rgba(16, 185, 129, 0.2)';
+                        bgStyle = 'rgba(16, 185, 129, 0.02)';
+                      }
+
+                      return (
+                        <div key={key} className="glass-panel" style={{
+                          padding: '14px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          border: borderStyle,
+                          background: bgStyle,
+                          borderRadius: '8px',
+                          gap: '12px'
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: '#fff', fontSize: '0.9rem' }}>
+                              <span style={{ color: 'var(--cyan)' }}>{os.icon}</span>
+                              {os.name}
+                            </div>
+                            {statusBadge}
+                          </div>
+
+                          {build.status !== 'active' ? (
+                            <div style={{
+                              background: 'rgba(0, 0, 0, 0.2)',
+                              border: '1px solid rgba(255,255,255,0.02)',
+                              padding: '6px 10px',
+                              borderRadius: '6px',
+                              fontSize: '0.75rem',
+                              color: 'var(--text-secondary)',
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              gap: '6px'
+                            }}>
+                              <AlertTriangle size={12} style={{ color: build.status === 'deprecated' ? 'var(--red)' : 'var(--orange)', marginTop: '2px', flexShrink: 0 }} />
+                              <div style={{ lineHeight: '1.2' }}>
+                                {build.error_message || `${os.name} build is not currently supported.`}
+                              </div>
+                            </div>
+                          ) : (
+                            <a href={resolveDownloadUrl(build.url)} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm" style={{ alignSelf: 'stretch', justifyContent: 'center', gap: '6px', fontSize: '0.8rem', padding: '6px 10px' }}>
+                              <Download size={12} /> Download for {os.name}
+                            </a>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {game.features && game.features.length > 0 && (
                 <>

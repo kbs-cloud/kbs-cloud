@@ -58,7 +58,7 @@ export default function Library({
                   </div>
 
                   <div className="library-card-actions">
-                    {game.id === 'glimmerwood' ? (
+                    {!game.prod_url || game.prod_url.trim() === '' ? (
                       <button 
                         className="btn btn-primary btn-sm launch-btn"
                         onClick={() => setSelectedGame(game)}

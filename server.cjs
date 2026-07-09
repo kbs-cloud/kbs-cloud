@@ -59,8 +59,8 @@ setInterval(() => {
   }
 }, 10 * 60 * 1000); // Clean up every 10 minutes
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
 
 // CORS configuration (allow local dev origins)
@@ -199,6 +199,56 @@ app.get('/api/auth/me', async (req, res) => {
   }
 });
 
+// Mock login endpoint for testing
+app.post('/api/auth/mock-login', async (req, res) => {
+  const { email, displayName, role } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  try {
+    const now = new Date().toISOString();
+    const defaultAvatar = displayName ? displayName[0].toUpperCase() : email[0].toUpperCase();
+
+    // Ensure user profile exists in database
+    const profileExists = await dbGet('SELECT email FROM user_profiles WHERE email = ?', [email]);
+    if (!profileExists) {
+      await dbRun(
+        'INSERT INTO user_profiles (email, display_name, avatar_url, bio, level, xp, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [email, displayName || email.split('@')[0], defaultAvatar, 'Ready to play!', 1, 0, now, now]
+      );
+    }
+
+    // Set role
+    if (role) {
+      await dbRun('INSERT OR REPLACE INTO user_roles (email, role, created_at, updated_at) VALUES (?, ?, ?, ?)', [
+        email, role, now, now
+      ]);
+    }
+
+    // Create session
+    const sessionId = crypto.randomBytes(32).toString('hex');
+    sessions.set(sessionId, {
+      email,
+      displayName: displayName || email.split('@')[0],
+      isGoogleLinked: false,
+      createdAt: Date.now()
+    });
+
+    res.cookie('hub_session_id', sessionId, {
+      httpOnly: true,
+      path: '/',
+      sameSite: 'lax',
+      secure: false,
+      maxAge: 2 * 60 * 60 * 1000
+    });
+
+    res.json({ success: true, user: { email, displayName, role } });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 3. Logout endpoint
 app.post('/api/auth/logout', (req, res) => {
   const sessionId = req.cookies['hub_session_id'];
@@ -306,7 +356,9 @@ app.get('/api/apps', async (req, res) => {
       features: r.features ? JSON.parse(r.features) : [],
       systemRequirements: r.system_requirements ? JSON.parse(r.system_requirements) : {},
       isOnline: !!r.is_online,
-      isMultiplayer: !!r.is_multiplayer
+      isMultiplayer: !!r.is_multiplayer,
+      website: r.website || '',
+      build_urls: r.build_urls ? JSON.parse(r.build_urls) : {}
     }));
     res.json({ success: true, apps: parsed });
   } catch (err) {
@@ -324,7 +376,9 @@ app.get('/api/apps/:id', async (req, res) => {
       features: r.features ? JSON.parse(r.features) : [],
       systemRequirements: r.system_requirements ? JSON.parse(r.system_requirements) : {},
       isOnline: !!r.is_online,
-      isMultiplayer: !!r.is_multiplayer
+      isMultiplayer: !!r.is_multiplayer,
+      website: r.website || '',
+      build_urls: r.build_urls ? JSON.parse(r.build_urls) : {}
     };
     res.json({ success: true, app: parsed });
   } catch (err) {
@@ -632,6 +686,8 @@ app.get('/api/developer/apps', requireGlobalRole(['admin', 'developer']), async 
         tags: r.tags ? JSON.parse(r.tags) : [],
         features: r.features ? JSON.parse(r.features) : [],
         systemRequirements: r.system_requirements ? JSON.parse(r.system_requirements) : {},
+        website: r.website || '',
+        build_urls: r.build_urls ? JSON.parse(r.build_urls) : {},
         userPermission: permission
       });
     }
@@ -642,8 +698,61 @@ app.get('/api/developer/apps', requireGlobalRole(['admin', 'developer']), async 
   }
 });
 
+app.post('/api/developer/upload-cover', requireGlobalRole(['admin', 'developer']), async (req, res) => {
+  const { fileName, fileData } = req.body;
+  if (!fileName || !fileData) {
+    return res.status(400).json({ error: 'Filename and base64 data are required.' });
+  }
+
+  try {
+    const matches = fileData.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      return res.status(400).json({ error: 'Invalid base64 image data.' });
+    }
+
+    const mimeType = matches[1];
+    const base64Data = matches[2];
+
+    if (!mimeType.startsWith('image/')) {
+      return res.status(400).json({ error: 'Only image files are allowed.' });
+    }
+
+    let extension = 'png';
+    if (mimeType === 'image/jpeg' || mimeType === 'image/jpg') {
+      extension = 'jpg';
+    } else if (mimeType === 'image/gif') {
+      extension = 'gif';
+    } else if (mimeType === 'image/webp') {
+      extension = 'webp';
+    } else if (mimeType === 'image/svg+xml') {
+      extension = 'svg';
+    }
+
+    const buffer = Buffer.from(base64Data, 'base64');
+    if (buffer.length > 5 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Image size exceeds the 5MB limit.' });
+    }
+
+    const uploadsDir = path.join(__dirname, 'public', 'uploads');
+    const fs = require('fs');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const uniqueFileName = `${crypto.randomUUID()}.${extension}`;
+    const filePath = path.join(uploadsDir, uniqueFileName);
+
+    await fs.promises.writeFile(filePath, buffer);
+
+    const publicUrl = `/uploads/${uniqueFileName}`;
+    res.json({ success: true, url: publicUrl });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/developer/apps', requireGlobalRole(['admin', 'developer']), async (req, res) => {
-  const { id, title, developer, publisher, releaseDate, description, fullDescription, tags, features, systemRequirements, prodUrl, devUrl, githubUrl, downloadUrl, coverImage, icon, isOnline, isMultiplayer } = req.body;
+  const { id, title, developer, publisher, releaseDate, description, fullDescription, tags, features, systemRequirements, prodUrl, devUrl, githubUrl, downloadUrl, coverImage, icon, isOnline, isMultiplayer, website, buildUrls } = req.body;
 
   if (!id || !title) {
     return res.status(400).json({ error: 'App ID and Title are required' });
@@ -663,14 +772,14 @@ app.post('/api/developer/apps', requireGlobalRole(['admin', 'developer']), async
     const now = new Date().toISOString();
 
     await dbRun(
-      `INSERT INTO apps (id, title, developer, publisher, release_date, description, full_description, tags, features, system_requirements, prod_url, dev_url, github_url, download_url, cover_image, icon, is_online, is_multiplayer, app_token, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO apps (id, title, developer, publisher, release_date, description, full_description, tags, features, system_requirements, prod_url, dev_url, github_url, download_url, cover_image, icon, is_online, is_multiplayer, app_token, website, build_urls, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id, title, developer || '', publisher || '', releaseDate || 'TBD',
         description || '', fullDescription || '',
         JSON.stringify(tags || []), JSON.stringify(features || []), JSON.stringify(systemRequirements || {}),
         prodUrl || '', devUrl || '', githubUrl || '', downloadUrl || '', coverImage || '', icon || '🎮',
-        isOnline ? 1 : 0, isMultiplayer ? 1 : 0, appToken, now, now
+        isOnline ? 1 : 0, isMultiplayer ? 1 : 0, appToken, website || '', JSON.stringify(buildUrls || {}), now, now
       ]
     );
 
@@ -688,7 +797,7 @@ app.post('/api/developer/apps', requireGlobalRole(['admin', 'developer']), async
 
 app.put('/api/developer/apps/:id', requireAppPermission('write'), async (req, res) => {
   const appId = req.params.id;
-  const { title, developer, publisher, releaseDate, description, fullDescription, tags, features, systemRequirements, prodUrl, devUrl, githubUrl, downloadUrl, coverImage, icon, isOnline, isMultiplayer } = req.body;
+  const { title, developer, publisher, releaseDate, description, fullDescription, tags, features, systemRequirements, prodUrl, devUrl, githubUrl, downloadUrl, coverImage, icon, isOnline, isMultiplayer, website, buildUrls } = req.body;
 
   try {
     const exists = await dbGet('SELECT id FROM apps WHERE id = ?', [appId]);
@@ -699,14 +808,14 @@ app.put('/api/developer/apps/:id', requireAppPermission('write'), async (req, re
     const now = new Date().toISOString();
     await dbRun(
       `UPDATE apps 
-       SET title = ?, developer = ?, publisher = ?, release_date = ?, description = ?, full_description = ?, tags = ?, features = ?, system_requirements = ?, prod_url = ?, dev_url = ?, github_url = ?, download_url = ?, cover_image = ?, icon = ?, is_online = ?, is_multiplayer = ?, updated_at = ?
+       SET title = ?, developer = ?, publisher = ?, release_date = ?, description = ?, full_description = ?, tags = ?, features = ?, system_requirements = ?, prod_url = ?, dev_url = ?, github_url = ?, download_url = ?, cover_image = ?, icon = ?, is_online = ?, is_multiplayer = ?, website = ?, build_urls = ?, updated_at = ?
        WHERE id = ?`,
       [
         title, developer || '', publisher || '', releaseDate || '',
         description || '', fullDescription || '',
         JSON.stringify(tags || []), JSON.stringify(features || []), JSON.stringify(systemRequirements || {}),
         prodUrl || '', devUrl || '', githubUrl || '', downloadUrl || '', coverImage || '', icon || '🎮',
-        isOnline ? 1 : 0, isMultiplayer ? 1 : 0, now, appId
+        isOnline ? 1 : 0, isMultiplayer ? 1 : 0, website || '', JSON.stringify(buildUrls || {}), now, appId
       ]
     );
 
@@ -1203,6 +1312,9 @@ app.all('/api/coordinator/{*splat}', (req, res) => {
   });
 });
 
+// Serves dynamic uploader files
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+
 // Serves the client SPA files in production
 app.use(express.static(path.join(__dirname, 'dist')));
 app.get('*splat', (req, res) => {
@@ -1257,6 +1369,7 @@ if (process.env.FRONTEND_PORT && String(process.env.FRONTEND_PORT) !== String(PO
     });
   });
 
+  frontendApp.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
   frontendApp.use(express.static(path.join(__dirname, 'dist')));
   frontendApp.get('*splat', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
