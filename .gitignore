@@ -47,3 +47,7 @@ deploy.sh
 
 # Build outputs
 out/
+
+# Game client downloads
+public/downloads/*.zip
+
