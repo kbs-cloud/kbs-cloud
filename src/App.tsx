@@ -19,9 +19,21 @@ import { OfflineManager } from './shared/offlineDb';
 export default function App() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loadingSession, setLoadingSession] = useState(true);
-  const [activeTab, setActiveTab] = useState<'store' | 'library' | 'profile' | 'developer' | 'downloads' | 'testing'>('store');
+  const [activeTab, setActiveTab] = useState<'store' | 'library' | 'profile' | 'developer' | 'downloads' | 'testing'>(() => {
+    const validTabs = ['store', 'library', 'profile', 'developer', 'downloads', 'testing'] as const;
+    const hash = window.location.hash.replace('#', '');
+    const tabPart = hash.split('/')[0];
+    if ((validTabs as readonly string[]).includes(tabPart)) {
+      return tabPart as typeof validTabs[number];
+    }
+    return 'store';
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+  
+  // Hub data states
+  const [games, setGames] = useState<Game[]>([]);
+  const [loadingGames, setLoadingGames] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'error' } | null>(null);
   const [showLegal, setShowLegal] = useState<'terms' | 'privacy' | 'none'>('none');
@@ -41,6 +53,67 @@ export default function App() {
       setShowLegal('terms');
     }
   }, []);
+
+  // Sync activeTab and selectedGame changes to the URL hash
+  useEffect(() => {
+    let hash = `#${activeTab}`;
+    if (selectedGame) {
+      hash += `/${selectedGame.id}`;
+    }
+    if (window.location.hash !== hash) {
+      window.location.hash = hash;
+    }
+  }, [activeTab, selectedGame]);
+
+  // Sync URL hash changes to activeTab and selectedGame (handles back/forward navigation, initial load, and games load)
+  useEffect(() => {
+    const validTabs = ['store', 'library', 'profile', 'developer', 'downloads', 'testing'] as const;
+    
+    const syncFromHash = () => {
+      const hash = window.location.hash.replace('#', '');
+      const parts = hash.split('/');
+      const tabPart = parts[0];
+      const gameId = parts[1];
+
+      if ((validTabs as readonly string[]).includes(tabPart)) {
+        Promise.resolve().then(() => {
+          setActiveTab(tabPart as typeof validTabs[number]);
+          
+          if (gameId) {
+            if (games.length > 0) {
+              const foundGame = games.find(g => g.id === gameId);
+              if (foundGame) {
+                setSelectedGame(foundGame);
+              } else {
+                setSelectedGame(null);
+              }
+            }
+          } else {
+            setSelectedGame(null);
+          }
+        });
+      }
+    };
+
+    // Run sync on mount and whenever games list updates
+    syncFromHash();
+
+    window.addEventListener('hashchange', syncFromHash);
+    return () => {
+      window.removeEventListener('hashchange', syncFromHash);
+    };
+  }, [games]);
+
+  // Auth protection redirect: if active tab requires user but loadingSession completes and user is null, fallback to 'store'
+  useEffect(() => {
+    if (!loadingSession && !user) {
+      if (activeTab === 'profile' || activeTab === 'developer') {
+        Promise.resolve().then(() => {
+          setActiveTab('store');
+        });
+      }
+    }
+  }, [loadingSession, user, activeTab]);
   
   // Performance mode state & effect
   const [performanceMode, setPerformanceMode] = useState<boolean>(() => {
@@ -56,9 +129,7 @@ export default function App() {
     localStorage.setItem('perf-mode', String(performanceMode));
   }, [performanceMode]);
 
-  // Hub data states
-  const [games, setGames] = useState<Game[]>([]);
-  const [loadingGames, setLoadingGames] = useState(true);
+
 
   const showToastMsg = (message: string, type: 'success' | 'info' | 'error' = 'info') => {
     setToast({ message, type });
