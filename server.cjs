@@ -85,6 +85,8 @@ app.use(cors({
   credentials: true
 }));
 
+const processedAuthCodes = new Map();
+
 // 1. SSO Auth Callback handler
 app.get('/api/auth/callback', async (req, res) => {
   const { code } = req.query;
@@ -94,9 +96,47 @@ app.get('/api/auth/callback', async (req, res) => {
     return res.status(400).send('Missing authorization code.');
   }
 
+  const sendSuccess = (isIframeRes) => {
+    if (isIframeRes) {
+      return res.send(`
+        <!DOCTYPE html>
+        <html>
+          <body>
+            <script>
+              if (window.opener) {
+                window.opener.postMessage({ type: 'SSO_LOGIN_SUCCESS' }, '*');
+              } else {
+                window.parent.postMessage({ type: 'SSO_LOGIN_SUCCESS' }, window.location.origin);
+              }
+            </script>
+          </body>
+        </html>
+      `);
+    }
+    res.redirect('/');
+  };
+
+  const existingSessionId = req.cookies['hub_session_id'];
+  if (existingSessionId && sessions.has(existingSessionId)) {
+    return sendSuccess(isIframe);
+  }
+
+  if (processedAuthCodes.has(code)) {
+    const prevSessionId = processedAuthCodes.get(code);
+    if (sessions.has(prevSessionId)) {
+      res.cookie('hub_session_id', prevSessionId, {
+        httpOnly: true,
+        path: '/',
+        sameSite: 'lax',
+        secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+        maxAge: 2 * 60 * 60 * 1000
+      });
+      return sendSuccess(isIframe);
+    }
+  }
+
   try {
     // Exchange authorization code for a token with the central kbs-auth server
-    // Note: Since this runs server-side, it will fetch from the central auth server
     const tokenRes = await fetch(`${AUTH_SERVER_URL}/api/auth/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -133,6 +173,9 @@ app.get('/api/auth/callback', async (req, res) => {
       createdAt: Date.now()
     });
 
+    processedAuthCodes.set(code, sessionId);
+    setTimeout(() => processedAuthCodes.delete(code), 60000);
+
     // Set HttpOnly session cookie
     res.cookie('hub_session_id', sessionId, {
       httpOnly: true,
@@ -142,27 +185,12 @@ app.get('/api/auth/callback', async (req, res) => {
       maxAge: 2 * 60 * 60 * 1000 // 2 hours
     });
 
-    if (isIframe) {
-      return res.send(`
-        <!DOCTYPE html>
-        <html>
-          <body>
-            <script>
-              if (window.opener) {
-                window.opener.postMessage({ type: 'SSO_LOGIN_SUCCESS' }, '*');
-              } else {
-                window.parent.postMessage({ type: 'SSO_LOGIN_SUCCESS' }, window.location.origin);
-              }
-            </script>
-          </body>
-        </html>
-      `);
-    }
-
-    // Redirect user back to frontend home page
-    res.redirect('/');
+    return sendSuccess(isIframe);
   } catch (error) {
     console.error('SSO token exchange failed:', error);
+    if (existingSessionId && sessions.has(existingSessionId)) {
+      return sendSuccess(isIframe);
+    }
     if (isIframe) {
       return res.status(500).send('SSO exchange failed.');
     }
@@ -659,8 +687,9 @@ function requireAppPermission(requiredPermission) {
 
 app.get('/api/developer/apps', requireGlobalRole(['admin', 'developer']), async (req, res) => {
   try {
+    const filter = req.user.role === 'admin' ? (req.query.filter || 'my') : 'my';
     let rows;
-    if (req.user.role === 'admin') {
+    if (filter === 'all' && req.user.role === 'admin') {
       rows = await dbAll('SELECT * FROM apps ORDER BY created_at DESC');
     } else {
       const sql = `
@@ -675,11 +704,11 @@ app.get('/api/developer/apps', requireGlobalRole(['admin', 'developer']), async 
     const parsed = [];
     for (const r of rows) {
       let permission = 'read';
-      if (req.user.role === 'admin') {
+      const collab = await dbGet('SELECT permission FROM app_collaborators WHERE app_id = ? AND email = ?', [r.id, req.user.email]);
+      if (collab) {
+        permission = collab.permission;
+      } else if (req.user.role === 'admin') {
         permission = 'admin';
-      } else {
-        const collab = await dbGet('SELECT permission FROM app_collaborators WHERE app_id = ? AND email = ?', [r.id, req.user.email]);
-        if (collab) permission = collab.permission;
       }
       parsed.push({
         ...r,
@@ -973,6 +1002,35 @@ app.get('/api/admin/users', requireGlobalRole(['admin']), async (req, res) => {
     }
 
     res.json({ success: true, users: result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/users/role', requireGlobalRole(['admin']), async (req, res) => {
+  const { email, role } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required.' });
+  }
+  if (role !== null && !['admin', 'developer', 'pending'].includes(role)) {
+    return res.status(400).json({ error: 'Invalid role.' });
+  }
+  if (req.user.email === email && role !== 'admin') {
+    return res.status(400).json({ error: 'Cannot downgrade your own Admin role.' });
+  }
+
+  try {
+    const formattedEmail = email.trim().toLowerCase();
+    const now = new Date().toISOString();
+    const exists = await dbGet('SELECT email FROM user_roles WHERE email = ?', [formattedEmail]);
+    if (role === null) {
+      await dbRun('DELETE FROM user_roles WHERE email = ?', [formattedEmail]);
+    } else if (exists) {
+      await dbRun('UPDATE user_roles SET role = ?, updated_at = ? WHERE email = ?', [role, now, formattedEmail]);
+    } else {
+      await dbRun('INSERT INTO user_roles (email, role, created_at, updated_at) VALUES (?, ?, ?, ?)', [formattedEmail, role, now, now]);
+    }
+    res.json({ success: true, message: 'User role updated successfully.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

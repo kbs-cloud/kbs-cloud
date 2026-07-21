@@ -166,6 +166,7 @@ async function initDatabase() {
     await dbRun("UPDATE apps SET prod_url = 'https://alchemy.kbs-cloud.com' WHERE id = 'alchemists-crucible' AND prod_url != 'https://alchemy.kbs-cloud.com'");
     await dbRun("UPDATE apps SET cover_image = '/glimmerwood_cover.png' WHERE id = 'glimmerwood' AND cover_image != '/glimmerwood_cover.png'");
     await dbRun("UPDATE apps SET github_url = 'https://github.com/kbs-cloud/glimmerwood' WHERE id = 'glimmerwood' AND github_url != 'https://github.com/kbs-cloud/glimmerwood'");
+    await dbRun("UPDATE apps SET download_url = 'https://github.com/kbs-cloud/glimmerwood/releases' WHERE id = 'glimmerwood' AND download_url != 'https://github.com/kbs-cloud/glimmerwood/releases'");
     
     // Set Glimmerwood to a native game with website and OS build config
     const defaultBuilds = {

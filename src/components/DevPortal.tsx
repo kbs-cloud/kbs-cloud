@@ -20,6 +20,9 @@ export default function DevPortal({
   // Global Tab for Admins: 'apps' or 'iam'
   const [portalTab, setPortalTab] = useState<'apps' | 'iam'>('apps');
 
+  // Filter state for apps console: 'my' (collaborations only) or 'all' (system wide for admin)
+  const [appFilter, setAppFilter] = useState<'my' | 'all'>('my');
+
   // Portal Navigation Views
   const [devApps, setDevApps] = useState<Game[]>([]);
   const [isAddingApp, setIsAddingApp] = useState(false);
@@ -59,21 +62,21 @@ export default function DevPortal({
   const [formFullDesc, setFormFullDesc] = useState('');
   const [formTags, setFormTags] = useState('');
   const [formFeatures, setFormFeatures] = useState('');
-  const [formOs, setFormOs] = useState('');
-  const [formCpu, setFormCpu] = useState('');
-  const [formMemory, setFormMemory] = useState('');
-  const [formGraphics, setFormGraphics] = useState('');
-  const [formStorage, setFormStorage] = useState('');
   const [formProdUrl, setFormProdUrl] = useState('');
   const [formDevUrl, setFormDevUrl] = useState('');
   const [formGithubUrl, setFormGithubUrl] = useState('');
   const [formDownloadUrl, setFormDownloadUrl] = useState('');
   const [formCoverImage, setFormCoverImage] = useState('');
-  const [formIcon, setFormIcon] = useState('');
-  const [formIsOnline, setFormIsOnline] = useState(true);
-  const [formIsMultiplayer, setFormIsMultiplayer] = useState(true);
+  const [formIcon, setFormIcon] = useState('🎮');
+  const [formIsOnline, setFormIsOnline] = useState(false);
+  const [formIsMultiplayer, setFormIsMultiplayer] = useState(false);
   const [formWebsite, setFormWebsite] = useState('');
   const [formIsWebGame, setFormIsWebGame] = useState(true);
+  const [formOs, setFormOs] = useState('');
+  const [formCpu, setFormCpu] = useState('');
+  const [formMemory, setFormMemory] = useState('');
+  const [formGraphics, setFormGraphics] = useState('');
+  const [formStorage, setFormStorage] = useState('');
 
   const [formBuildWindowsUrl, setFormBuildWindowsUrl] = useState('');
   const [formBuildWindowsStatus, setFormBuildWindowsStatus] = useState('inactive');
@@ -162,8 +165,9 @@ export default function DevPortal({
     }
   };
 
-  const fetchDevAppsList = () => {
-    fetch('/api/developer/apps')
+  const fetchDevAppsList = (filterParam?: 'my' | 'all') => {
+    const activeFilter = filterParam || appFilter;
+    fetch(`/api/developer/apps?filter=${activeFilter}`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {
@@ -176,9 +180,9 @@ export default function DevPortal({
   // Fetch developer apps list on mount/user change if authorized
   useEffect(() => {
     if (user.role === 'admin' || user.role === 'developer') {
-      fetchDevAppsList();
+      fetchDevAppsList(appFilter);
     }
-  }, [user]);
+  }, [user, appFilter]);
 
   // Fetch achievements when managing game changes
   useEffect(() => {
@@ -305,12 +309,17 @@ export default function DevPortal({
 
   const handleUpdateUserRole = async (email: string, role: string | null) => {
     try {
-      const res = await fetch(`/api/admin/users/${encodeURIComponent(email)}/role`, {
-        method: 'PUT',
+      const res = await fetch('/api/admin/users/role', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role })
+        body: JSON.stringify({ email, role })
       });
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch (parseErr) {
+        data = { error: `Server returned HTTP ${res.status}` };
+      }
       if (res.ok && data.success) {
         showToastMsg(`Role updated for ${email}`, 'success');
         fetchIamUsers();
@@ -320,8 +329,9 @@ export default function DevPortal({
       } else {
         showToastMsg(data.error || 'Failed to update user role.', 'error');
       }
-    } catch {
-      showToastMsg('Network connection error.', 'error');
+    } catch (err: any) {
+      console.error('Error updating user role:', err);
+      showToastMsg(err?.message || 'Network connection error.', 'error');
     }
   };
 
@@ -688,10 +698,27 @@ export default function DevPortal({
     <div style={{ marginTop: '20px' }}>
       {/* Top Header Row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h2 className="section-title" style={{ marginBottom: 0 }}>
-          <Key size={24} style={{ color: 'var(--cyan)' }} />
-          Developer Command Center
-        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <h2 className="section-title" style={{ marginBottom: 0 }}>
+            <Key size={24} style={{ color: 'var(--cyan)' }} />
+            Developer Command Center
+          </h2>
+          <span style={{
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            padding: '3px 10px',
+            borderRadius: '12px',
+            background: user.role === 'admin' ? 'rgba(168, 85, 247, 0.15)' : 'rgba(6, 182, 212, 0.15)',
+            color: user.role === 'admin' ? 'var(--purple)' : 'var(--cyan)',
+            border: '1px solid currentColor',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}>
+            {user.role === 'admin' && <Shield size={12} />}
+            {user.role === 'admin' ? 'SITE ADMIN' : 'DEVELOPER'}
+          </span>
+        </div>
 
         {!isAddingApp && !editingApp && !managingApp && portalTab === 'apps' && (
           <button className="btn btn-primary btn-sm" onClick={() => { resetAppForm(); setIsAddingApp(true); }}>
@@ -1827,8 +1854,34 @@ export default function DevPortal({
         </div>
       ) : (
         /* APPLICATIONS LIST VIEW */
-        <div className="glass-panel" style={{ padding: '24px', overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {user.role === 'admin' && (
+            <div className="glass-panel" style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Shield size={16} style={{ color: 'var(--purple)' }} />
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Site Admin Game Filter:</span>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  className={`btn ${appFilter === 'my' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                  onClick={() => { setAppFilter('my'); fetchDevAppsList('my'); }}
+                  style={{ borderRadius: '14px', padding: '4px 14px', fontSize: '0.8rem' }}
+                >
+                  My Collaborations
+                </button>
+                <button
+                  className={`btn ${appFilter === 'all' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                  onClick={() => { setAppFilter('all'); fetchDevAppsList('all'); }}
+                  style={{ borderRadius: '14px', padding: '4px 14px', fontSize: '0.8rem' }}
+                >
+                  All System Games (Admin)
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="glass-panel" style={{ padding: '24px', overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-muted)' }}>
                 <th style={{ padding: '12px' }}>Game</th>
@@ -1931,6 +1984,7 @@ export default function DevPortal({
               )}
             </tbody>
           </table>
+        </div>
         </div>
       )}
     </div>

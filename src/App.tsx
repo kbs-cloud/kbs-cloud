@@ -52,6 +52,12 @@ export default function App() {
     } else if (viewParam === 'terms') {
       setShowLegal('terms');
     }
+
+    const errParam = params.get('error');
+    if (errParam) {
+      showToastMsg('SSO Authentication failed. Please try again.', 'error');
+      window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+    }
   }, []);
 
   // Sync activeTab and selectedGame changes to the URL hash

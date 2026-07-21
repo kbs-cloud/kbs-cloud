@@ -197,6 +197,22 @@ export default function Header({
                     <span style={{ fontWeight: 600, fontSize: '0.9rem', color: '#fff' }}>{user.displayName}</span>
                   </div>
                   <div className="dropdown-email" style={{ marginTop: '4px' }}>{user.email}</div>
+                  {user.role && (
+                    <div style={{ marginTop: '6px' }}>
+                      <span style={{
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        padding: '2px 6px',
+                        borderRadius: '8px',
+                        background: user.role === 'admin' ? 'rgba(168, 85, 247, 0.2)' : user.role === 'developer' ? 'rgba(6, 182, 212, 0.2)' : 'rgba(234, 179, 8, 0.2)',
+                        color: user.role === 'admin' ? 'var(--purple)' : user.role === 'developer' ? 'var(--cyan)' : 'var(--orange)',
+                        border: '1px solid currentColor',
+                        letterSpacing: '0.5px'
+                      }}>
+                        {user.role === 'admin' ? 'SITE ADMIN' : user.role === 'developer' ? 'DEVELOPER' : 'PENDING'}
+                      </span>
+                    </div>
+                  )}
                   <div style={{
                     fontSize: '0.7rem',
                     fontFamily: 'var(--font-mono)',
